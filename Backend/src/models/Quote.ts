@@ -298,6 +298,11 @@ quoteSchema.virtual('statusFormatted').get(function() {
   return statusMap[this.status] || this.status;
 });
 
+// Virtual para valor total
+quoteSchema.virtual('totalAmount').get(function(this: any) {
+  return this.pricing.totalAmount;
+});
+
 // Virtual para valor total formatado
 quoteSchema.virtual('formattedTotalAmount').get(function() {
   return new Intl.NumberFormat('pt-BR', {
@@ -327,10 +332,10 @@ quoteSchema.virtual('formattedValidUntil').get(function() {
 });
 
 // Virtual para dias até expirar
-quoteSchema.virtual('daysUntilExpiry').get(function() {
+quoteSchema.virtual('daysUntilExpiry').get(function(this: any) {
   const today = new Date();
   const expiry = new Date(this.pricing.validUntil);
-  const diffTime = expiry - today;
+  const diffTime = expiry.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 });
@@ -341,7 +346,7 @@ quoteSchema.virtual('isExpired').get(function() {
 });
 
 // Virtual para status de urgência
-quoteSchema.virtual('isUrgent').get(function() {
+quoteSchema.virtual('isUrgent').get(function(this: any) {
   return this.daysUntilExpiry <= 3 && this.status === 'enviado';
 });
 
@@ -349,7 +354,7 @@ quoteSchema.virtual('isUrgent').get(function() {
 quoteSchema.pre('save', async function(next) {
   if (this.isNew && !this.quoteNumber) {
     const year = new Date().getFullYear();
-    const count = await this.constructor.countDocuments({
+    const count = await (this.constructor as any).countDocuments({
       createdAt: {
         $gte: new Date(year, 0, 1),
         $lt: new Date(year + 1, 0, 1)

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
+import '../types/mongoose-fix';
 import config from '../config';
 import User from '../models/User';
 
@@ -301,7 +302,7 @@ router.put('/change-password', [
     const { currentPassword, newPassword } = req.body;
 
     // Verificar senha atual
-    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    const isCurrentPasswordValid = await user.comparePassword!(currentPassword);
     if (!isCurrentPasswordValid) {
       return res.status(400).json({ message: 'Senha atual incorreta' });
     }

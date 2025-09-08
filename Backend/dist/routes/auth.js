@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const express_validator_1 = require("express-validator");
+require("../types/mongoose-fix");
 const config_1 = __importDefault(require("../config"));
 const User_1 = __importDefault(require("../models/User"));
 const router = express_1.default.Router();

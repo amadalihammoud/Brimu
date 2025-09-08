@@ -277,10 +277,10 @@ paymentSchema.virtual('formattedPaidAt').get(function() {
 });
 
 // Virtual para dias em atraso
-paymentSchema.virtual('daysOverdue').get(function() {
+paymentSchema.virtual('daysOverdue').get(function(this: any) {
   if (this.status === 'pendente' && this.dueDate < new Date()) {
     const today = new Date();
-    const diffTime = today - this.dueDate;
+    const diffTime = today.getTime() - this.dueDate.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
   return 0;
@@ -302,7 +302,7 @@ paymentSchema.virtual('isUrgent').get(function() {
 paymentSchema.pre('save', async function(next) {
   if (this.isNew && !this.paymentNumber) {
     const year = new Date().getFullYear();
-    const count = await this.constructor.countDocuments({
+    const count = await (this.constructor as any).countDocuments({
       createdAt: {
         $gte: new Date(year, 0, 1),
         $lt: new Date(year + 1, 0, 1)

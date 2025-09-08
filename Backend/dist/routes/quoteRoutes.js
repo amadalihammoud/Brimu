@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+require("../types/mongoose-fix");
 const models_1 = require("../models");
 const router = express_1.default.Router();
 // GET /api/quotes - Listar todos os orçamentos

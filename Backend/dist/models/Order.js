@@ -482,7 +482,7 @@ orderSchema.methods.removeEquipment = function (equipmentId) {
 };
 // Método estático para listar equipamentos disponíveis em uma data
 orderSchema.statics.getAvailableEquipment = async function (scheduledDate, excludeOrderId = null) {
-    const Equipment = this.model('Equipment');
+    const Equipment = mongoose_1.default.model('Equipment');
     // Buscar todos os equipamentos ativos
     const allEquipment = await Equipment.find({
         status: 'ativo',

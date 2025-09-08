@@ -442,7 +442,7 @@ orderSchema.statics.checkEquipmentDateConflict = async function(equipmentId, sch
   const endOfDay = new Date(scheduledDate);
   endOfDay.setHours(23, 59, 59, 999);
   
-  const query = {
+  const query: any = {
     'assignedEquipment.equipment': equipmentId,
     'scheduling.scheduledDate': {
       $gte: startOfDay,
@@ -549,7 +549,7 @@ orderSchema.methods.removeEquipment = function(equipmentId) {
 
 // Método estático para listar equipamentos disponíveis em uma data
 orderSchema.statics.getAvailableEquipment = async function(scheduledDate, excludeOrderId = null) {
-  const Equipment = this.model('Equipment');
+  const Equipment = mongoose.model('Equipment');
   
   // Buscar todos os equipamentos ativos
   const allEquipment = await Equipment.find({ 
@@ -564,7 +564,7 @@ orderSchema.statics.getAvailableEquipment = async function(scheduledDate, exclud
   endOfDay.setHours(23, 59, 59, 999);
   
   // Buscar ordens que têm equipamentos atribuídos na data especificada
-  const query = {
+  const query: any = {
     'scheduling.scheduledDate': {
       $gte: startOfDay,
       $lte: endOfDay

@@ -259,7 +259,7 @@ paymentSchema.virtual('formattedPaidAt').get(function () {
 paymentSchema.virtual('daysOverdue').get(function () {
     if (this.status === 'pendente' && this.dueDate < new Date()) {
         const today = new Date();
-        const diffTime = today - this.dueDate;
+        const diffTime = today.getTime() - this.dueDate.getTime();
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
     return 0;

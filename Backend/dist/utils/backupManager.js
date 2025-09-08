@@ -359,5 +359,17 @@ class BackupManager {
             return null;
         }
     }
+    // Método para verificar integridade dos backups
+    async verifyBackupIntegrity(backupId) {
+        try {
+            // Implementação básica - pode ser expandida
+            const backupPath = path_1.default.join(this.backupDir, backupId);
+            await fs_1.promises.access(backupPath);
+            return { isValid: true };
+        }
+        catch (error) {
+            return { isValid: false, errors: [`Backup ${backupId} não encontrado`] };
+        }
+    }
 }
 exports.default = new BackupManager();

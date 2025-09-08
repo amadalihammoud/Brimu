@@ -228,7 +228,7 @@ serviceSchema.methods.isAvailableForDate = function(date) {
   
   const today = new Date();
   const bookingDate = new Date(date);
-  const daysDiff = Math.ceil((bookingDate - today) / (1000 * 60 * 60 * 24));
+  const daysDiff = Math.ceil((bookingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   
   return daysDiff >= this.settings.minAdvanceBooking && 
          daysDiff <= this.settings.maxAdvanceBooking;

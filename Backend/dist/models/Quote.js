@@ -287,6 +287,10 @@ quoteSchema.virtual('statusFormatted').get(function () {
     };
     return statusMap[this.status] || this.status;
 });
+// Virtual para valor total
+quoteSchema.virtual('totalAmount').get(function () {
+    return this.pricing.totalAmount;
+});
 // Virtual para valor total formatado
 quoteSchema.virtual('formattedTotalAmount').get(function () {
     return new Intl.NumberFormat('pt-BR', {
@@ -316,7 +320,7 @@ quoteSchema.virtual('formattedValidUntil').get(function () {
 quoteSchema.virtual('daysUntilExpiry').get(function () {
     const today = new Date();
     const expiry = new Date(this.pricing.validUntil);
-    const diffTime = expiry - today;
+    const diffTime = expiry.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
 });

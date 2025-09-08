@@ -137,7 +137,7 @@ equipmentSchema.virtual('daysUntilMaintenance').get(function(this: any) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
 
-equipmentSchema.virtual('maintenanceStatus').get(function() {
+equipmentSchema.virtual('maintenanceStatus').get(function(this: any) {
   const daysUntil = this.daysUntilMaintenance;
   if (daysUntil === null) return 'desconhecido';
   if (daysUntil <= 0) return 'vencida';

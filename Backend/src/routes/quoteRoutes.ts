@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import '../types/mongoose-fix';
 import { Quote, Service, User } from '../models';
 
 const router = express.Router();

@@ -7,6 +7,11 @@ import cron from 'node-cron';
 const execAsync = promisify(exec);
 
 class BackupManager {
+  public backupDir: string;
+  public uploadDir: string; 
+  public publicDir: string;
+  public storageDir: string;
+
   constructor() {
     this.backupDir = path.join(process.cwd(), 'storage', 'backups');
     this.uploadDir = path.join(process.cwd(), 'uploads');
@@ -406,6 +411,18 @@ class BackupManager {
     } catch (error) {
       console.error('❌ Erro ao obter estatísticas de backup:', error);
       return null;
+    }
+  }
+
+  // Método para verificar integridade dos backups
+  async verifyBackupIntegrity(backupId: string): Promise<{ isValid: boolean; errors?: string[] }> {
+    try {
+      // Implementação básica - pode ser expandida
+      const backupPath = path.join(this.backupDir, backupId);
+      await fs.access(backupPath);
+      return { isValid: true };
+    } catch (error) {
+      return { isValid: false, errors: [`Backup ${backupId} não encontrado`] };
     }
   }
 }
