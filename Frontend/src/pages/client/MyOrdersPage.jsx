@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { FileText, Eye, Clock, CheckCircle, Calendar, DollarSign, TrendingUp, User } from 'lucide-react';
 import { 
-  PageHeader, 
-  StatsCards, 
-  SearchFilterBar, 
-  DataTable, 
-  StatusBadge,
-  EmptyState
-} from '../../components/common/StandardComponents';
+  ModernPageHeader as PageHeader, 
+  ModernStatsCards as StatsCards, 
+  ModernSearchFilterBar as SearchFilterBar, 
+  ModernDataTable as DataTable, 
+  ModernStatusBadge as StatusBadge,
+  ModernEmptyState as EmptyState
+} from '../../components/common/ModernComponents';
 
 const MyOrdersPage = ({ user, theme = 'light' }) => {
   const [filterStatus, setFilterStatus] = useState('all');
