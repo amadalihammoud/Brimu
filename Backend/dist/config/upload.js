@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.documentStorage = exports.imageStorage = exports.multipleDocuments = exports.multipleImages = exports.documentUpload = exports.imageUpload = void 0;
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -20,6 +21,7 @@ const imageStorage = multer_1.default.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix + path_1.default.extname(file.originalname));
     }
 });
+exports.imageStorage = imageStorage;
 // Configuração de armazenamento para documentos
 const documentStorage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
@@ -34,6 +36,7 @@ const documentStorage = multer_1.default.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix + path_1.default.extname(file.originalname));
     }
 });
+exports.documentStorage = documentStorage;
 // Filtros de arquivo
 const imageFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -65,6 +68,7 @@ const imageUpload = (0, multer_1.default)({
     },
     fileFilter: imageFilter
 });
+exports.imageUpload = imageUpload;
 const documentUpload = (0, multer_1.default)({
     storage: documentStorage,
     limits: {
@@ -72,15 +76,10 @@ const documentUpload = (0, multer_1.default)({
     },
     fileFilter: documentFilter
 });
+exports.documentUpload = documentUpload;
 // Middleware para múltiplas imagens
 const multipleImages = imageUpload.array('images', 10); // Máximo 10 imagens
+exports.multipleImages = multipleImages;
 // Middleware para múltiplos documentos
 const multipleDocuments = documentUpload.array('documents', 5); // Máximo 5 documentos
-module.exports = {
-    imageUpload,
-    documentUpload,
-    multipleImages,
-    multipleDocuments,
-    imageStorage,
-    documentStorage
-};
+exports.multipleDocuments = multipleDocuments;

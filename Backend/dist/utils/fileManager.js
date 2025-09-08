@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const sharp_1 = __importDefault(require("sharp"));
+const crypto_1 = require("crypto");
 const File_1 = __importDefault(require("../models/File"));
 const User_1 = __importDefault(require("../models/User"));
 class FileManager {
@@ -225,7 +226,7 @@ class FileManager {
     async calculateChecksum(filePath) {
         try {
             const fileBuffer = await promises_1.default.readFile(filePath);
-            return crypto.createHash('sha256').update(fileBuffer).digest('hex');
+            return (0, crypto_1.createHash)('sha256').update(fileBuffer).digest('hex');
         }
         catch (error) {
             console.error('Erro ao calcular checksum:', error);

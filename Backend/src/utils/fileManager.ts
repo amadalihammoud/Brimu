@@ -21,9 +21,9 @@ class FileManager {
   async ensureDirectories() {
     for (const [key, dirPath] of Object.entries(this.basePaths)) {
       try {
-        await fs.access(dirPath);
+        await fs.access(dirPath as string);
       } catch {
-        await fs.mkdir(dirPath, { recursive: true });
+        await fs.mkdir(dirPath as string, { recursive: true });
       }
     }
   }
@@ -249,7 +249,7 @@ class FileManager {
   async calculateChecksum(filePath) {
     try {
       const fileBuffer = await fs.readFile(filePath);
-      return crypto.createHash('sha256').update(fileBuffer).digest('hex');
+      return createHash('sha256').update(fileBuffer).digest('hex');
     } catch (error) {
       console.error('Erro ao calcular checksum:', error);
       return null;

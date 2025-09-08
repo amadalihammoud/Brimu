@@ -82,11 +82,12 @@ router.post('/image', auth_1.auth, upload_1.imageUpload.single('image'), async (
 // Upload de múltiplas imagens
 router.post('/images', auth_1.auth, upload_1.multipleImages, async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) {
+        if (!req.files || (Array.isArray(req.files) ? req.files.length === 0 : Object.keys(req.files).length === 0)) {
             return res.status(400).json({ message: 'Nenhum arquivo enviado' });
         }
         const uploadedFiles = [];
-        for (const file of req.files) {
+        const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+        for (const file of files) {
             const fileInfo = await fileManager_1.default.getFileInfo(file.path);
             uploadedFiles.push({
                 filename: file.filename,
@@ -132,11 +133,12 @@ router.post('/document', auth_1.auth, upload_1.documentUpload.single('document')
 // Upload de múltiplos documentos
 router.post('/documents', auth_1.auth, upload_1.multipleDocuments, async (req, res) => {
     try {
-        if (!req.files || req.files.length === 0) {
+        if (!req.files || (Array.isArray(req.files) ? req.files.length === 0 : Object.keys(req.files).length === 0)) {
             return res.status(400).json({ message: 'Nenhum arquivo enviado' });
         }
         const uploadedFiles = [];
-        for (const file of req.files) {
+        const files = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+        for (const file of files) {
             const fileInfo = await fileManager_1.default.getFileInfo(file.path);
             uploadedFiles.push({
                 filename: file.filename,

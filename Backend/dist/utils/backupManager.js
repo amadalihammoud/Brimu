@@ -328,8 +328,8 @@ class BackupManager {
             console.error('❌ Erro na limpeza de backups:', error);
         }
     }
-    // Obter estatísticas de backup
-    async getBackupStats() {
+    // Obter estatísticas gerais de backup
+    async getGeneralBackupStats() {
         try {
             const backups = await this.listBackups();
             const stats = {

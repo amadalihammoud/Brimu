@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import '../types/mongoose-fix';
+import { parseStringParam, parseNumberParam } from '../types/mongoose-fix';
 import { Order, Service, User, Equipment } from '../models';
 
 const router = express.Router();
@@ -7,15 +8,17 @@ const router = express.Router();
 // GET /api/orders - Listar todas as ordens
 router.get('/', async (req, res) => {
   try {
-    const { status, client, service, limit = 50, page = 1 } = req.query;
+    const { status, client, service, limit, page } = req.query;
     
     // Construir filtros
-    const filters = {};
-    if (status) filters.status = status;
-    if (client) filters.client = client;
-    if (service) filters.service = service;
+    const filters: any = {};
+    if (status) filters.status = parseStringParam(status);
+    if (client) filters.client = parseStringParam(client);
+    if (service) filters.service = parseStringParam(service);
     
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const limitNum = parseNumberParam(limit) || 50;
+    const pageNum = parseNumberParam(page) || 1;
+    const skip = (pageNum - 1) * limitNum;
     
     const orders = await Order.find(filters)
       .populate('client', 'name email phone')
@@ -24,7 +27,7 @@ router.get('/', async (req, res) => {
       .populate('assignedEquipment.equipment', 'name code brand model status')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limitNum);
     
     const total = await Order.countDocuments(filters);
     

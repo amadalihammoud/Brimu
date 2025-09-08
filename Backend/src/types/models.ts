@@ -1,7 +1,7 @@
-import { Document, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 // User Model Types
-export interface IUser extends Document {
+export interface IUser {
   _id: Types.ObjectId;
   name: string;
   email: string;
@@ -14,7 +14,7 @@ export interface IUser extends Document {
 }
 
 // Equipment Model Types
-export interface IEquipment extends Document {
+export interface IEquipment {
   _id: Types.ObjectId;
   name: string;
   type: string;
@@ -22,7 +22,7 @@ export interface IEquipment extends Document {
   serialNumber?: string;
   purchaseDate?: Date;
   maintenanceSchedule?: Date[];
-  assignedTo?: Types.ObjectId;
+  assignedTo?: Types.ObjectId | string;
   location?: string;
   notes?: string;
   createdAt: Date;
@@ -30,7 +30,7 @@ export interface IEquipment extends Document {
 }
 
 // Service Model Types
-export interface IService extends Document {
+export interface IService {
   _id: Types.ObjectId;
   name: string;
   description: string;
@@ -44,7 +44,7 @@ export interface IService extends Document {
 }
 
 // Order Model Types
-export interface IOrder extends Document {
+export interface IOrder {
   _id: Types.ObjectId;
   orderNumber: string;
   client: {
@@ -69,7 +69,7 @@ export interface IOrder extends Document {
 }
 
 // Quote Model Types
-export interface IQuote extends Document {
+export interface IQuote {
   _id: Types.ObjectId;
   quoteNumber: string;
   client: {
@@ -92,7 +92,7 @@ export interface IQuote extends Document {
 }
 
 // File Model Types
-export interface IFile extends Document {
+export interface IFile {
   _id: Types.ObjectId;
   filename: string;
   originalname: string;
@@ -109,7 +109,7 @@ export interface IFile extends Document {
 }
 
 // Payment Model Types
-export interface IPayment extends Document {
+export interface IPayment {
   _id: Types.ObjectId;
   order: Types.ObjectId;
   amount: number;

@@ -5,21 +5,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("../types/mongoose-fix");
+const mongoose_fix_1 = require("../types/mongoose-fix");
 const models_1 = require("../models");
 const router = express_1.default.Router();
 // GET /api/orders - Listar todas as ordens
 router.get('/', async (req, res) => {
     try {
-        const { status, client, service, limit = 50, page = 1 } = req.query;
+        const { status, client, service, limit, page } = req.query;
         // Construir filtros
         const filters = {};
         if (status)
-            filters.status = status;
+            filters.status = (0, mongoose_fix_1.parseStringParam)(status);
         if (client)
-            filters.client = client;
+            filters.client = (0, mongoose_fix_1.parseStringParam)(client);
         if (service)
-            filters.service = service;
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+            filters.service = (0, mongoose_fix_1.parseStringParam)(service);
+        const limitNum = (0, mongoose_fix_1.parseNumberParam)(limit) || 50;
+        const pageNum = (0, mongoose_fix_1.parseNumberParam)(page) || 1;
+        const skip = (pageNum - 1) * limitNum;
         const orders = await models_1.Order.find(filters)
             .populate('client', 'name email phone')
             .populate('service', 'name category basePrice')
@@ -27,7 +30,7 @@ router.get('/', async (req, res) => {
             .populate('assignedEquipment.equipment', 'name code brand model status')
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limitNum);
         const total = await models_1.Order.countDocuments(filters);
         res.json({
             success: true,

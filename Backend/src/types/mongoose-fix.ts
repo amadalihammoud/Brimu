@@ -1,10 +1,20 @@
 // Type fixes for Mongoose issues
 import { ParsedQs } from 'qs';
 
-// Helper function to safely get string from query
-export function getStringFromQuery(value: string | ParsedQs | (string | ParsedQs)[] | undefined, defaultValue = ''): string {
-  if (typeof value === 'string') return value;
-  return defaultValue;
+// Helper functions for query parameter validation
+export function parseStringParam(param: string | ParsedQs | (string | ParsedQs)[] | undefined): string {
+  if (Array.isArray(param)) return param[0]?.toString() || '';
+  return param?.toString() || '';
+}
+
+export function parseNumberParam(param: string | number | ParsedQs | (string | ParsedQs)[] | undefined): number {
+  const str = parseStringParam(param);
+  return parseInt(str) || 0;
+}
+
+export function parseBooleanParam(param: string | ParsedQs | (string | ParsedQs)[] | undefined): boolean {
+  const str = parseStringParam(param);
+  return str === 'true' || str === '1';
 }
 declare module 'mongoose' {
   interface Document {
@@ -40,7 +50,7 @@ declare module 'mongoose' {
     lastModifiedBy?: string;
   }
   
-  interface Model<T> {
+  interface Model<T, TQueryHelpers = {}, TMethods = {}, TVirtuals = {}, TSchema = any> {
     findByClient?: (clientId: string) => Promise<T[]>;
     findByStatus?: (status: string) => Promise<T[]>;
     findByCategory?: (category: string) => Promise<T[]>;

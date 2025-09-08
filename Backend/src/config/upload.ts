@@ -80,7 +80,7 @@ const multipleImages = imageUpload.array('images', 10); // Máximo 10 imagens
 // Middleware para múltiplos documentos
 const multipleDocuments = documentUpload.array('documents', 5); // Máximo 5 documentos
 
-module.exports = {
+export {
   imageUpload,
   documentUpload,
   multipleImages,
