@@ -23,7 +23,7 @@ const app = express();
 const PORT = Number(config.server.port);
 
 // Middleware de compressão
-app.use(compression());
+app.use(compression() as any);
 
 // Middlewares de segurança
 app.use(helmet(config.security.helmet));
