@@ -17,7 +17,7 @@ exports.equipmentCreateSchema = joi_1.default.object({
         'string.max': 'Nome deve ter no máximo 200 caracteres'
     }),
     category: joi_1.default.string()
-        .valid('chainsaw', 'pruner', 'hedge_trimmer', 'lawn_mower', 'truck', 'trailer', 'safety_equipment', 'other')
+        .valid('motosserra', 'poda_alta', 'rocadeira', 'cortador_grama', 'caminhao', 'reboque', 'epi', 'outros')
         .required()
         .messages({
         'string.empty': 'Categoria do equipamento é obrigatória',
@@ -42,10 +42,10 @@ exports.equipmentCreateSchema = joi_1.default.object({
         'string.max': 'Modelo deve ter no máximo 100 caracteres'
     }),
     status: joi_1.default.string()
-        .valid('active', 'maintenance', 'inactive', 'retired')
-        .default('active')
+        .valid('ativo', 'manutencao', 'inativo', 'aposentado')
+        .default('ativo')
         .messages({
-        'any.only': 'Status deve ser: active, maintenance, inactive ou retired'
+        'any.only': 'Status deve ser: ativo, manutencao, inativo ou aposentado'
     }),
     serialNumber: joi_1.default.string()
         .max(100)
@@ -91,7 +91,7 @@ exports.equipmentUpdateSchema = joi_1.default.object({
         'string.max': 'Nome deve ter no máximo 200 caracteres'
     }),
     category: joi_1.default.string()
-        .valid('chainsaw', 'pruner', 'hedge_trimmer', 'lawn_mower', 'truck', 'trailer', 'safety_equipment', 'other')
+        .valid('motosserra', 'poda_alta', 'rocadeira', 'cortador_grama', 'caminhao', 'reboque', 'epi', 'outros')
         .messages({
         'any.only': 'Categoria deve ser uma das opções válidas'
     }),
@@ -110,9 +110,9 @@ exports.equipmentUpdateSchema = joi_1.default.object({
         'string.max': 'Modelo deve ter no máximo 100 caracteres'
     }),
     status: joi_1.default.string()
-        .valid('active', 'maintenance', 'inactive', 'retired')
+        .valid('ativo', 'manutencao', 'inativo', 'aposentado')
         .messages({
-        'any.only': 'Status deve ser: active, maintenance, inactive ou retired'
+        'any.only': 'Status deve ser: ativo, manutencao, inativo ou aposentado'
     }),
     serialNumber: joi_1.default.string()
         .max(100)
@@ -158,4 +158,3 @@ exports.equipmentAssignmentSchema = joi_1.default.object({
         'string.pattern.base': 'ID do usuário deve ser um ObjectId válido'
     })
 });
-//# sourceMappingURL=equipment.js.map

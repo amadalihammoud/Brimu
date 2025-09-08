@@ -64,4 +64,3 @@ const errorLogger = (err, req, res, next) => {
     next(err);
 };
 exports.errorLogger = errorLogger;
-//# sourceMappingURL=requestLogger.js.map

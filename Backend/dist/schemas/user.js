@@ -94,4 +94,3 @@ exports.changePasswordSchema = joi_1.default.object({
         'string.pattern.base': 'Nova senha deve conter pelo menos uma letra minúscula, uma maiúscula e um número'
     })
 });
-//# sourceMappingURL=user.js.map

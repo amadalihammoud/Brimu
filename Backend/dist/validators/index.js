@@ -106,4 +106,3 @@ exports.commonSchemas = {
         dateTo: joi_1.default.date().greater(joi_1.default.ref('dateFrom'))
     })
 };
-//# sourceMappingURL=index.js.map

@@ -24,7 +24,16 @@
       "Bash(start http://localhost:3002)",
       "Bash(start:*)",
       "Bash(del \"src\\components\\common\\ModernComponents.jsx\")",
-      "Bash(del \"C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Frontend\\src\\components\\common\\ModernComponents.jsx\")"
+      "Bash(del \"C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Frontend\\src\\components\\common\\ModernComponents.jsx\")",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ren:*)",
+      "Bash(mv:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
