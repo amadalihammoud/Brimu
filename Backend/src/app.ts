@@ -22,7 +22,7 @@ import backupManager from './utils/backupManager';
 const app = express();
 const PORT = Number(config.server.port);
 
-// Middleware de compressão
+// Middleware de compressão - TypeScript fix
 app.use(compression() as any);
 
 // Middlewares de segurança
