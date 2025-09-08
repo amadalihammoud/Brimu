@@ -6,6 +6,7 @@ import fileManager from '../utils/fileManager';
 import { auth } from '../middleware/auth';
 import File from '../models/File';
 import User from '../models/User';
+import { parseStringParam, parseNumberParam } from '../utils/queryHelpers';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // Upload de imagem única
-router.post('/image', auth, imageUpload.single('image'), async (req: Request, res: Response) => {
+router.post('/image', auth, (imageUpload as any).single('image'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
@@ -86,7 +87,7 @@ router.post('/image', auth, imageUpload.single('image'), async (req: Request, re
 });
 
 // Upload de múltiplas imagens
-router.post('/images', auth, multipleImages, async (req: Request, res: Response) => {
+router.post('/images', auth, (multipleImages as any), async (req: Request, res: Response) => {
   try {
     if (!req.files || (Array.isArray(req.files) ? req.files.length === 0 : Object.keys(req.files).length === 0)) {
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
@@ -118,7 +119,7 @@ router.post('/images', auth, multipleImages, async (req: Request, res: Response)
 });
 
 // Upload de documento único
-router.post('/document', auth, documentUpload.single('document'), async (req: Request, res: Response) => {
+router.post('/document', auth, (documentUpload as any).single('document'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
@@ -143,7 +144,7 @@ router.post('/document', auth, documentUpload.single('document'), async (req: Re
 });
 
 // Upload de múltiplos documentos
-router.post('/documents', auth, multipleDocuments, async (req: Request, res: Response) => {
+router.post('/documents', auth, (multipleDocuments as any), async (req: Request, res: Response) => {
   try {
     if (!req.files || (Array.isArray(req.files) ? req.files.length === 0 : Object.keys(req.files).length === 0)) {
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
@@ -352,10 +353,10 @@ router.get('/search', auth, async (req: Request, res: Response) => {
     const criteria = {
       userId: req.user.id,
       category,
-      tags: tags ? tags.split(',') : undefined,
+      tags: tags ? parseStringParam(tags).split(',') : undefined,
       search,
-      limit: parseInt(limit),
-      skip: parseInt(skip)
+      limit: parseNumberParam(limit),
+      skip: parseNumberParam(skip)
     };
 
     const files = await fileManager.findFiles(criteria);

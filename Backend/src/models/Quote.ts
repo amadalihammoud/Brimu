@@ -393,7 +393,7 @@ quoteSchema.pre('save', function(next) {
 
 // Middleware para atualizar updatedAt
 quoteSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
+  (this as any).updatedAt = new Date();
   next();
 });
 

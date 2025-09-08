@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import backupManager from '../utils/backupManager';
 import { auth } from '../middleware/auth';
 import User from '../models/User';
+import { parseStringParam } from '../utils/queryHelpers';
 
 const router = express.Router();
 
@@ -94,7 +95,7 @@ router.post('/restore/:backupName', auth, requireAdmin, async (req: Request, res
 // Obter estatísticas de backup
 router.get('/stats', auth, requireAdmin, async (req: Request, res: Response) => {
   try {
-    const stats = await backupManager.getBackupStats();
+    const stats = await backupManager.getGeneralBackupStats();
     
     res.status(200).json({
       message: 'Estatísticas de backup obtidas',
@@ -124,7 +125,7 @@ router.post('/cleanup', auth, requireAdmin, async (req: Request, res: Response) 
 router.get('/download/:backupName', auth, requireAdmin, async (req: Request, res: Response) => {
   try {
     const { backupName } = req.params;
-    const { type = 'manual' } = req.query;
+    const type = parseStringParam(req.query.type) || 'manual';
     
     const backupPath = path.join(backupManager.backupDir, type, backupName);
     
@@ -151,7 +152,7 @@ router.get('/download/:backupName', auth, requireAdmin, async (req: Request, res
 router.get('/verify/:backupName', auth, requireAdmin, async (req: Request, res: Response) => {
   try {
     const { backupName } = req.params;
-    const { type = 'manual' } = req.query;
+    const type = parseStringParam(req.query.type) || 'manual';
     
     const backupPath = path.join(backupManager.backupDir, type, backupName);
     
@@ -223,7 +224,7 @@ router.get('/status', auth, requireAdmin, async (req: Request, res: Response) =>
     // Aqui você implementaria a lógica para verificar o status dos jobs
     // Por enquanto, retornamos informações básicas
     
-    const stats = await backupManager.getBackupStats();
+    const stats = await backupManager.getGeneralBackupStats();
     
     res.status(200).json({
       message: 'Status dos backups obtido',

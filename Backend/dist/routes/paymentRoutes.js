@@ -5,11 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const models_1 = require("../models");
+const queryHelpers_1 = require("../utils/queryHelpers");
 const router = express_1.default.Router();
 // GET /api/payments - Listar todos os pagamentos
 router.get('/', async (req, res) => {
     try {
-        const { status, client, order, quote, limit = 50, page = 1 } = req.query;
+        const query = req.query;
+        const status = (0, queryHelpers_1.parseStringParam)(query.status);
+        const client = (0, queryHelpers_1.parseStringParam)(query.client);
+        const order = (0, queryHelpers_1.parseStringParam)(query.order);
+        const quote = (0, queryHelpers_1.parseStringParam)(query.quote);
+        const limit = (0, queryHelpers_1.parseNumberParam)(query.limit) || 50;
+        const page = (0, queryHelpers_1.parseNumberParam)(query.page) || 1;
         // Construir filtros
         const filters = {};
         if (status)
@@ -20,7 +27,7 @@ router.get('/', async (req, res) => {
             filters.order = order;
         if (quote)
             filters.quote = quote;
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
         const payments = await models_1.Payment.find(filters)
             .populate('client', 'name email phone')
             .populate('order', 'serviceDetails.name status')
@@ -28,16 +35,16 @@ router.get('/', async (req, res) => {
             .populate('createdBy', 'name email')
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limit);
         const total = await models_1.Payment.countDocuments(filters);
         res.json({
             success: true,
             data: payments,
             pagination: {
                 total,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                pages: Math.ceil(total / parseInt(limit))
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
             }
         });
     }
@@ -444,7 +451,7 @@ router.get('/overdue', async (req, res) => {
 // GET /api/payments/due-soon - Buscar pagamentos próximos do vencimento
 router.get('/due-soon', async (req, res) => {
     try {
-        const days = parseInt(req.query.days) || 3;
+        const days = (0, queryHelpers_1.parseNumberParam)(req.query.days) || 3;
         const payments = await models_1.Payment.findDueSoon(days);
         res.json({
             success: true,

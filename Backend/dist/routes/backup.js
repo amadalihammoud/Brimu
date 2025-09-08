@@ -9,6 +9,7 @@ const promises_1 = __importDefault(require("fs/promises"));
 const backupManager_1 = __importDefault(require("../utils/backupManager"));
 const auth_1 = require("../middleware/auth");
 const User_1 = __importDefault(require("../models/User"));
+const queryHelpers_1 = require("../utils/queryHelpers");
 const router = express_1.default.Router();
 // Middleware para verificar permissões de administrador
 const requireAdmin = async (req, res, next) => {
@@ -93,7 +94,7 @@ router.post('/restore/:backupName', auth_1.auth, requireAdmin, async (req, res) 
 // Obter estatísticas de backup
 router.get('/stats', auth_1.auth, requireAdmin, async (req, res) => {
     try {
-        const stats = await backupManager_1.default.getBackupStats();
+        const stats = await backupManager_1.default.getGeneralBackupStats();
         res.status(200).json({
             message: 'Estatísticas de backup obtidas',
             stats: stats
@@ -121,7 +122,7 @@ router.post('/cleanup', auth_1.auth, requireAdmin, async (req, res) => {
 router.get('/download/:backupName', auth_1.auth, requireAdmin, async (req, res) => {
     try {
         const { backupName } = req.params;
-        const { type = 'manual' } = req.query;
+        const type = (0, queryHelpers_1.parseStringParam)(req.query.type) || 'manual';
         const backupPath = path_1.default.join(backupManager_1.default.backupDir, type, backupName);
         // Verificar se backup existe
         try {
@@ -145,7 +146,7 @@ router.get('/download/:backupName', auth_1.auth, requireAdmin, async (req, res) 
 router.get('/verify/:backupName', auth_1.auth, requireAdmin, async (req, res) => {
     try {
         const { backupName } = req.params;
-        const { type = 'manual' } = req.query;
+        const type = (0, queryHelpers_1.parseStringParam)(req.query.type) || 'manual';
         const backupPath = path_1.default.join(backupManager_1.default.backupDir, type, backupName);
         // Verificar se backup existe
         try {
@@ -203,7 +204,7 @@ router.get('/status', auth_1.auth, requireAdmin, async (req, res) => {
     try {
         // Aqui você implementaria a lógica para verificar o status dos jobs
         // Por enquanto, retornamos informações básicas
-        const stats = await backupManager_1.default.getBackupStats();
+        const stats = await backupManager_1.default.getGeneralBackupStats();
         res.status(200).json({
             message: 'Status dos backups obtido',
             status: {

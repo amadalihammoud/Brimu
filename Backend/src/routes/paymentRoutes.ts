@@ -1,21 +1,28 @@
 import express, { Request, Response } from 'express';
 import { Payment, Order, Quote, User } from '../models';
+import { parseStringParam, parseNumberParam, QueryParams } from '../utils/queryHelpers';
 
 const router = express.Router();
 
 // GET /api/payments - Listar todos os pagamentos
 router.get('/', async (req, res) => {
   try {
-    const { status, client, order, quote, limit = 50, page = 1 } = req.query;
+    const query = req.query as QueryParams;
+    const status = parseStringParam(query.status);
+    const client = parseStringParam(query.client);
+    const order = parseStringParam(query.order);
+    const quote = parseStringParam(query.quote);
+    const limit = parseNumberParam(query.limit) || 50;
+    const page = parseNumberParam(query.page) || 1;
     
     // Construir filtros
-    const filters = {};
+    const filters: any = {};
     if (status) filters.status = status;
     if (client) filters.client = client;
     if (order) filters.order = order;
     if (quote) filters.quote = quote;
     
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const skip = (page - 1) * limit;
     
     const payments = await Payment.find(filters)
       .populate('client', 'name email phone')
@@ -24,7 +31,7 @@ router.get('/', async (req, res) => {
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limit);
     
     const total = await Payment.countDocuments(filters);
     
@@ -33,9 +40,9 @@ router.get('/', async (req, res) => {
       data: payments,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parseInt(limit))
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
       }
     });
   } catch (error) {
@@ -486,7 +493,7 @@ router.get('/overdue', async (req, res) => {
 // GET /api/payments/due-soon - Buscar pagamentos próximos do vencimento
 router.get('/due-soon', async (req, res) => {
   try {
-    const days = parseInt(req.query.days) || 3;
+    const days = parseNumberParam(req.query.days) || 3;
     const payments = await Payment.findDueSoon(days);
     
     res.json({

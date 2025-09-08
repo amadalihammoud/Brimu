@@ -1,21 +1,27 @@
 import express, { Request, Response } from 'express';
 import '../types/mongoose-fix';
 import { Quote, Service, User } from '../models';
+import { parseStringParam, parseNumberParam, QueryParams } from '../utils/queryHelpers';
 
 const router = express.Router();
 
 // GET /api/quotes - Listar todos os orçamentos
 router.get('/', async (req, res) => {
   try {
-    const { status, client, service, limit = 50, page = 1 } = req.query;
+    const query = req.query as QueryParams;
+    const status = parseStringParam(query.status);
+    const client = parseStringParam(query.client);
+    const service = parseStringParam(query.service);
+    const limit = parseNumberParam(query.limit) || 50;
+    const page = parseNumberParam(query.page) || 1;
     
     // Construir filtros
-    const filters = {};
+    const filters: any = {};
     if (status) filters.status = status;
     if (client) filters.client = client;
     if (service) filters.service = service;
     
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const skip = (page - 1) * limit;
     
     const quotes = await Quote.find(filters)
       .populate('client', 'name email phone')
@@ -23,7 +29,7 @@ router.get('/', async (req, res) => {
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limit);
     
     const total = await Quote.countDocuments(filters);
     
@@ -32,9 +38,9 @@ router.get('/', async (req, res) => {
       data: quotes,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parseInt(limit))
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
       }
     });
   } catch (error) {

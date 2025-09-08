@@ -6,11 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("../types/mongoose-fix");
 const models_1 = require("../models");
+const queryHelpers_1 = require("../utils/queryHelpers");
 const router = express_1.default.Router();
 // GET /api/quotes - Listar todos os orçamentos
 router.get('/', async (req, res) => {
     try {
-        const { status, client, service, limit = 50, page = 1 } = req.query;
+        const query = req.query;
+        const status = (0, queryHelpers_1.parseStringParam)(query.status);
+        const client = (0, queryHelpers_1.parseStringParam)(query.client);
+        const service = (0, queryHelpers_1.parseStringParam)(query.service);
+        const limit = (0, queryHelpers_1.parseNumberParam)(query.limit) || 50;
+        const page = (0, queryHelpers_1.parseNumberParam)(query.page) || 1;
         // Construir filtros
         const filters = {};
         if (status)
@@ -19,23 +25,23 @@ router.get('/', async (req, res) => {
             filters.client = client;
         if (service)
             filters.service = service;
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
         const quotes = await models_1.Quote.find(filters)
             .populate('client', 'name email phone')
             .populate('service', 'name category basePrice')
             .populate('createdBy', 'name email')
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limit);
         const total = await models_1.Quote.countDocuments(filters);
         res.json({
             success: true,
             data: quotes,
             pagination: {
                 total,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                pages: Math.ceil(total / parseInt(limit))
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
             }
         });
     }

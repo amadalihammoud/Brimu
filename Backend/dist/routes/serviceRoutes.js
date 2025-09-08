@@ -5,19 +5,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const models_1 = require("../models");
+const queryHelpers_1 = require("../utils/queryHelpers");
 const router = express_1.default.Router();
 // GET /api/services - Listar todos os serviços
 router.get('/', async (req, res) => {
     try {
-        const { category, isActive, isAvailable } = req.query;
+        const query = req.query;
+        const category = (0, queryHelpers_1.parseStringParam)(query.category);
+        const isActive = query.isActive !== undefined ? (0, queryHelpers_1.parseBooleanParam)(query.isActive) : undefined;
+        const isAvailable = query.isAvailable !== undefined ? (0, queryHelpers_1.parseBooleanParam)(query.isAvailable) : undefined;
         // Construir filtros
         const filters = {};
         if (category)
             filters.category = category;
         if (isActive !== undefined)
-            filters.isActive = isActive === 'true';
+            filters.isActive = isActive;
         if (isAvailable !== undefined)
-            filters.isAvailable = isAvailable === 'true';
+            filters.isAvailable = isAvailable;
         const services = await models_1.Service.find(filters)
             .sort({ 'stats.averageRating': -1, name: 1 });
         res.json({

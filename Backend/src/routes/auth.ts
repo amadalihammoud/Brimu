@@ -55,7 +55,7 @@ router.post('/register', validateUser, async (req, res) => {
         role: user.role 
       },
       config.auth.jwtSecret as string,
-      { expiresIn: config.auth.jwtExpiresIn }
+      { expiresIn: config.auth.jwtExpiresIn } as any
     );
 
     res.status(201).json({
@@ -139,7 +139,7 @@ router.post('/login', [
         role: user.role 
       },
       config.auth.jwtSecret as string,
-      { expiresIn: config.auth.jwtExpiresIn }
+      { expiresIn: config.auth.jwtExpiresIn } as any
     );
 
     // Atualizar último login se usando MongoDB
@@ -237,7 +237,7 @@ router.put('/profile', async (req, res) => {
       return res.status(401).json({ message: 'Token não fornecido' });
     }
 
-    const decoded = jwt.verify(token, config.auth.jwtSecret);
+    const decoded = jwt.verify(token, config.auth.jwtSecret) as { id: string };
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -292,7 +292,7 @@ router.put('/change-password', [
       return res.status(401).json({ message: 'Token não fornecido' });
     }
 
-    const decoded = jwt.verify(token, config.auth.jwtSecret);
+    const decoded = jwt.verify(token, config.auth.jwtSecret) as { id: string };
     const user = await User.findById(decoded.id);
 
     if (!user) {

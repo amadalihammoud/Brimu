@@ -1,18 +1,22 @@
 import express, { Request, Response } from 'express';
 import { Service } from '../models';
+import { parseStringParam, parseBooleanParam, QueryParams } from '../utils/queryHelpers';
 
 const router = express.Router();
 
 // GET /api/services - Listar todos os serviços
 router.get('/', async (req, res) => {
   try {
-    const { category, isActive, isAvailable } = req.query;
+    const query = req.query as QueryParams;
+    const category = parseStringParam(query.category);
+    const isActive = query.isActive !== undefined ? parseBooleanParam(query.isActive) : undefined;
+    const isAvailable = query.isAvailable !== undefined ? parseBooleanParam(query.isAvailable) : undefined;
     
     // Construir filtros
-    const filters = {};
+    const filters: any = {};
     if (category) filters.category = category;
-    if (isActive !== undefined) filters.isActive = isActive === 'true';
-    if (isAvailable !== undefined) filters.isAvailable = isAvailable === 'true';
+    if (isActive !== undefined) filters.isActive = isActive;
+    if (isAvailable !== undefined) filters.isAvailable = isAvailable;
     
     const services = await Service.find(filters)
       .sort({ 'stats.averageRating': -1, name: 1 });

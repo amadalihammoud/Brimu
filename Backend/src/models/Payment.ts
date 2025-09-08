@@ -315,7 +315,7 @@ paymentSchema.pre('save', async function(next) {
 
 // Middleware para atualizar updatedAt
 paymentSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
+  (this as any).updatedAt = new Date();
   next();
 });
 

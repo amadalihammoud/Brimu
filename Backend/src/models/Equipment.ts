@@ -112,6 +112,9 @@ const equipmentSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  deactivatedAt: {
+    type: Date
+  },
   notes: {
     type: String,
     trim: true

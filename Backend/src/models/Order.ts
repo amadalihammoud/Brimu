@@ -344,7 +344,7 @@ orderSchema.virtual('formattedScheduledDate').get(function() {
 
 // Middleware para atualizar updatedAt
 orderSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
+  (this as any).updatedAt = new Date();
   next();
 });
 

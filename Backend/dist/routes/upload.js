@@ -11,6 +11,7 @@ const fileManager_1 = __importDefault(require("../utils/fileManager"));
 const auth_1 = require("../middleware/auth");
 const File_1 = __importDefault(require("../models/File"));
 const User_1 = __importDefault(require("../models/User"));
+const queryHelpers_1 = require("../utils/queryHelpers");
 const router = express_1.default.Router();
 // Middleware para garantir que os diretórios existam
 router.use(async (req, res, next) => {
@@ -311,10 +312,10 @@ router.get('/search', auth_1.auth, async (req, res) => {
         const criteria = {
             userId: req.user.id,
             category,
-            tags: tags ? tags.split(',') : undefined,
+            tags: tags ? (0, queryHelpers_1.parseStringParam)(tags).split(',') : undefined,
             search,
-            limit: parseInt(limit),
-            skip: parseInt(skip)
+            limit: (0, queryHelpers_1.parseNumberParam)(limit),
+            skip: (0, queryHelpers_1.parseNumberParam)(skip)
         };
         const files = await fileManager_1.default.findFiles(criteria);
         res.status(200).json({
