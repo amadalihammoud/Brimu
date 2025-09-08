@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Teste Final - Login Brimu Funcionando</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .container { 
+            background: white; border-radius: 20px; padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px; width: 100%;
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; font-size: 2em; }
+        .credentials { margin-bottom: 30px; }
+        .cred-button { 
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            background: linear-gradient(135deg, #16a085, #27ae60);
+            color: white; border: none; border-radius: 10px;
+            font-size: 16px; cursor: pointer; transition: all 0.3s;
+        }
+        .cred-button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(22, 160, 133, 0.3); 
+        }
+        .client-button { 
+            background: linear-gradient(135deg, #3498db, #2980b9); 
+        }
+        .client-button:hover { 
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3); 
+        }
+        .result { 
+            margin-top: 20px; padding: 15px; border-radius: 10px;
+            background: #f8f9fa; border-left: 4px solid #28a745;
+        }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .status { 
+            text-align: center; margin: 20px 0; 
+            font-weight: bold; font-size: 18px;
+        }
+        .success { color: #28a745; }
+        .loading { color: #ffc107; }
+        .error-text { color: #dc3545; }
+        pre { font-size: 12px; overflow-x: auto; }
+        .info { 
+            background: #e3f2fd; padding: 20px; border-radius: 10px;
+            margin-bottom: 20px; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 Sistema Brimu - Login Funcionando!</h1>
+        
+        <div class="info">
+            <strong>✅ Problema Corrigido!</strong><br>
+            CORS atualizado, credenciais de cliente adicionadas<br>
+            Backend: localhost:5000 | Frontend: localhost:3001
+        </div>
+
+        <div class="credentials">
+            <h3>🚀 Teste as Credenciais:</h3>
+            <button class="cred-button" onclick="testLogin('admin@brimu.com', 'admin123')">
+                🔧 ADMIN: admin@brimu.com / admin123
+            </button>
+            <button class="cred-button client-button" onclick="testLogin('teste@brimu.com', 'teste123')">
+                👤 CLIENTE: teste@brimu.com / teste123
+            </button>
+        </div>
+
+        <div id="status" class="status"></div>
+        <div id="result"></div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="window.open('http://localhost:3001/auth', '_blank')" 
+                    style="padding: 15px 30px; background: #6c63ff; color: white; border: none; border-radius: 10px; font-size: 16px; cursor: pointer;">
+                🚀 Abrir Login React
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const resultDiv = document.getElementById('result');
+
+        async function testLogin(email, password) {
+            statusDiv.innerHTML = '<span class="loading">🔄 Fazendo login...</span>';
+            resultDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span class="success">✅ Login ${data.user.role.toUpperCase()} realizado com sucesso!</span>`;
+                    resultDiv.innerHTML = `
+                        <div class="result">
+                            <strong>👤 Usuário:</strong> ${data.user.name}<br>
+                            <strong>📧 Email:</strong> ${data.user.email}<br>
+                            <strong>🏷️ Role:</strong> ${data.user.role}<br>
+                            <strong>🔑 Token:</strong> ${data.token.substring(0, 30)}...
+                        </div>
+                    `;
+                    
+                    // Testar redirecionamento após 2 segundos
+                    setTimeout(() => {
+                        statusDiv.innerHTML += '<br><span class="success">✅ Sistema totalmente funcional!</span>';
+                    }, 1000);
+                } else {
+                    statusDiv.innerHTML = '<span class="error-text">❌ Erro no login</span>';
+                    resultDiv.innerHTML = `<div class="result error"><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error-text">❌ Erro de conexão</span>';
+                resultDiv.innerHTML = `<div class="result error">Erro: ${error.message}</div>`;
+            }
+        }
+
+        // Teste automático de conectividade
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<span class="success">✅ Backend conectado e funcionando!</span>';
+                } else {
+                    statusDiv.innerHTML = '<span class="error-text">⚠️ Backend com problemas</span>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error-text">❌ Backend não encontrado</span>';
+            }
+        });
+    </script>
+</body>
+</html>

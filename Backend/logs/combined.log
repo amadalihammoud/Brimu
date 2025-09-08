@@ -1,0 +1,67 @@
+{"level":"info","message":"Sistema de logging inicializado com sucesso","metadata":{"requestId":"req456","userId":"user123"},"timestamp":"2025-09-05T13:41:37.936Z"}
+{"level":"error","message":"Erro capturado durante teste","metadata":{"error":{"message":"Erro de teste para demonstração","name":"Error","stack":"Error: Erro de teste para demonstração\n    at Object.<anonymous> (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\test-logger.js:15:19)\n    at Module._compile (node:internal/modules/cjs/loader:1688:14)\n    at Object..js (node:internal/modules/cjs/loader:1820:10)\n    at Module.load (node:internal/modules/cjs/loader:1423:32)\n    at Function._load (node:internal/modules/cjs/loader:1246:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49"},"method":"POST","url":"/api/test","userId":"user123"},"timestamp":"2025-09-05T13:41:37.944Z"}
+{"level":"info","message":"User action: login","metadata":{"action":"login","category":"user_action","details":{"ip":"192.168.1.100","userAgent":"Mozilla/5.0..."},"userId":"user123"},"timestamp":"2025-09-05T13:41:37.945Z"}
+{"level":"warn","message":"Security event: failed_login_attempt","metadata":{"attempts":3,"category":"security","email":"test@example.com","event":"failed_login_attempt","ip":"192.168.1.100"},"timestamp":"2025-09-05T13:41:37.946Z"}
+{"level":"info","message":"System event: server_start","metadata":{"category":"system","env":"development","event":"server_start","nodeVersion":"v22.18.0","port":5000},"timestamp":"2025-09-05T13:41:37.946Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:42:48.986Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:42:52.067Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:43:35.306Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:43:35.296Z"}
+{"level":"error","message":"Test error message","metadata":{"error":{"message":"Test error","name":"Error","stack":"Error: Test error\n    at Object.<anonymous> (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\tests\\unit\\logger.test.ts:45:21)\n    at Promise.then.completed (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at _runTest (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at _runTestsForDescribeBlock (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:121:9)\n    at _runTestsForDescribeBlock (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:121:9)\n    at run (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Backend\\node_modules\\jest-runner\\build\\testWorker.js:106:12)"},"userId":"user123"},"timestamp":"2025-09-05T13:43:35.440Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.480Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.511Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.526Z"}
+{"level":"info","message":"Test info message","metadata":{"requestId":"req123"},"timestamp":"2025-09-05T13:43:35.532Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.544Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.560Z"}
+{"level":"warn","message":"Test warning message","metadata":{"ip":"192.168.1.1"},"timestamp":"2025-09-05T13:43:35.563Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.578Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.595Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.608Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.623Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.635Z"}
+{"level":"info","message":"User action: user_login","metadata":{"action":"user_login","category":"user_action","details":{"ip":"192.168.1.1"},"userId":"user123"},"timestamp":"2025-09-05T13:43:35.639Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.650Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.660Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.675Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.688Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.711Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.725Z"}
+{"level":"warn","message":"Security event: failed_login_attempt","metadata":{"attempts":3,"category":"security","event":"failed_login_attempt","ip":"192.168.1.1"},"timestamp":"2025-09-05T13:43:35.728Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.744Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.755Z"}
+{"level":"info","message":"System event: server_start","metadata":{"category":"system","env":"production","event":"server_start","port":5000},"timestamp":"2025-09-05T13:43:35.760Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.775Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.783Z"}
+{"level":"info","message":"Test message without context","metadata":{},"timestamp":"2025-09-05T13:43:35.785Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.793Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.813Z"}
+{"level":"error","message":"Test error without error object","metadata":{"userId":"user123"},"timestamp":"2025-09-05T13:43:35.816Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.828Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.850Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.875Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.889Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.908Z"}
+{"level":"info","message":"Cache flushed","metadata":{},"timestamp":"2025-09-05T13:43:35.921Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:47:02.678Z"}
+{"level":"info","message":"System event: server_initializing","metadata":{"category":"system","event":"server_initializing","port":5000},"timestamp":"2025-09-05T13:47:02.688Z"}
+{"level":"info","message":"System event: server_started","metadata":{"category":"system","environment":"development","event":"server_started","port":5000},"timestamp":"2025-09-05T13:47:02.694Z"}
+{"level":"info","message":"User action: user_demo_created","metadata":{"action":"user_demo_created","category":"user_action","details":{"email":"joao@example.com","name":"Jo�o Silva","password":"Password123"},"userId":"demo"},"timestamp":"2025-09-05T13:49:53.616Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:54:18.819Z"}
+{"level":"info","message":"System event: server_initializing","metadata":{"category":"system","event":"server_initializing","port":5000},"timestamp":"2025-09-05T13:54:18.835Z"}
+{"level":"info","message":"System event: server_started","metadata":{"category":"system","environment":"development","equipment_count":2,"event":"server_started","port":5000,"users_count":2},"timestamp":"2025-09-05T13:54:18.844Z"}
+{"level":"info","message":"User action: login_attempt","metadata":{"action":"login_attempt","category":"user_action","details":{"ip":"::1"},"userId":"admin@brimu.com"},"timestamp":"2025-09-05T13:54:27.567Z"}
+{"level":"info","message":"User action: login_success","metadata":{"action":"login_success","category":"user_action","details":{"email":"admin@brimu.com","ip":"::1"},"userId":"1"},"timestamp":"2025-09-05T13:54:27.574Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T13:54:34.627Z"}
+{"level":"info","message":"User action: login_attempt","metadata":{"action":"login_attempt","category":"user_action","details":{"ip":"::1"},"userId":"admin@brimu.com"},"timestamp":"2025-09-05T13:55:56.274Z"}
+{"level":"info","message":"User action: login_success","metadata":{"action":"login_success","category":"user_action","details":{"email":"admin@brimu.com","ip":"::1"},"userId":"1"},"timestamp":"2025-09-05T13:55:56.280Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T13:56:02.192Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T13:56:02.199Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T13:56:02.211Z"}
+{"level":"info","message":"User action: equipment_created","metadata":{"action":"equipment_created","category":"user_action","details":{"createdAt":"2025-09-05T13:56:48.432Z","id":"3","location":"Teste Local","name":"Teste Equipamento","status":"available","type":"Ferramenta Teste"},"userId":"1"},"timestamp":"2025-09-05T13:56:48.432Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T13:57:26.022Z"}
+{"level":"info","message":"Redis client connected","metadata":{},"timestamp":"2025-09-05T13:58:33.212Z"}
+{"level":"info","message":"System event: server_initializing","metadata":{"category":"system","event":"server_initializing","port":5000},"timestamp":"2025-09-05T13:58:33.226Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T14:03:45.053Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T14:03:45.066Z"}
+{"level":"info","message":"User action: equipment_list","metadata":{"action":"equipment_list","category":"user_action","userId":"1"},"timestamp":"2025-09-05T14:03:45.090Z"}

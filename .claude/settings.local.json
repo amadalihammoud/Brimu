@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run typecheck:*)",
+      "Bash(node:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(mongo:*)",
+      "Bash(mongod:*)",
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(start http://localhost:5000/)",
+      "Bash(start http://localhost:3000/)",
+      "Bash(npm start)",
+      "Bash(sed:*)",
+      "Bash(start-system.bat)",
+      "Bash(cmd:*)",
+      "Bash(start http://localhost:3000)",
+      "Bash(timeout:*)",
+      "Bash(dir:*)",
+      "Bash(rd:*)",
+      "Bash(npm run:*)",
+      "Bash(start http://localhost:3002)",
+      "Bash(start:*)",
+      "Bash(del \"src\\components\\common\\ModernComponents.jsx\")",
+      "Bash(del \"C:\\Users\\amada\\OneDrive\\Área de Trabalho\\Brimu\\Frontend\\src\\components\\common\\ModernComponents.jsx\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

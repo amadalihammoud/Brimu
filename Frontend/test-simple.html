@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - Brimu</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px; 
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { 
+            background: #16a085; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        button:hover { background: #138d75; }
+        .result { 
+            margin-top: 20px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            background: #f8f9fa; 
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🌳 Teste Simples - Login Brimu</h1>
+    <p>Teste direto da API sem React</p>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="admin@brimu.com" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" value="admin123" required>
+        </div>
+        <button type="submit">Fazer Login</button>
+    </form>
+    
+    <div id="result"></div>
+    <div id="status"></div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const result = document.getElementById('result');
+        const status = document.getElementById('status');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            status.innerHTML = '<p>Fazendo login...</p>';
+            result.innerHTML = '';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    status.innerHTML = '<p class="success">✅ Login realizado com sucesso!</p>';
+                    result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    result.className = 'result success';
+                    
+                    // Agora vamos tentar acessar o frontend
+                    setTimeout(() => {
+                        status.innerHTML += '<p>Redirecionando para o sistema...</p>';
+                        window.location.href = 'http://localhost:3001/auth';
+                    }, 2000);
+                } else {
+                    status.innerHTML = '<p class="error">❌ Erro no login</p>';
+                    result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                status.innerHTML = '<p class="error">❌ Erro de conexão</p>';
+                result.innerHTML = '<pre>' + error.message + '</pre>';
+                result.className = 'result error';
+            }
+        });
+
+        // Testar conectividade automaticamente
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                if (response.ok) {
+                    status.innerHTML = '<p class="success">✅ Backend conectado</p>';
+                } else {
+                    status.innerHTML = '<p class="error">❌ Backend com problemas</p>';
+                }
+            } catch (error) {
+                status.innerHTML = '<p class="error">❌ Backend não encontrado</p>';
+            }
+        });
+    </script>
+</body>
+</html>

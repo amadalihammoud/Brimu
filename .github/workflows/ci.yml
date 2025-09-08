@@ -1,0 +1,263 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Backend Tests and Build
+  backend-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: Backend/package-lock.json
+
+    - name: Install Backend dependencies
+      working-directory: ./Backend
+      run: npm ci
+
+    - name: Run Backend linting
+      working-directory: ./Backend
+      run: npm run lint
+
+    - name: Run Backend type checking
+      working-directory: ./Backend
+      run: npm run typecheck
+
+    - name: Run Backend tests
+      working-directory: ./Backend
+      run: npm test
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/brimu-test
+        REDIS_URL: redis://localhost:6379
+        JWT_SECRET: test-jwt-secret
+
+    - name: Build Backend
+      working-directory: ./Backend
+      run: npm run build
+
+    - name: Upload Backend coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./Backend/coverage/lcov.info
+        flags: backend
+        name: backend-coverage
+
+  # Frontend Tests and Build
+  frontend-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: Frontend/package-lock.json
+
+    - name: Install Frontend dependencies
+      working-directory: ./Frontend
+      run: npm ci
+
+    - name: Run Frontend linting
+      working-directory: ./Frontend
+      run: npm run lint
+
+    - name: Build Frontend
+      working-directory: ./Frontend
+      run: npm run build
+
+    - name: Upload Frontend build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist-${{ matrix.node-version }}
+        path: Frontend/dist/
+
+  # Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: Audit Backend dependencies
+      working-directory: ./Backend
+      run: npm audit --audit-level moderate
+
+    - name: Audit Frontend dependencies
+      working-directory: ./Frontend
+      run: npm audit --audit-level moderate
+
+  # Integration Tests
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7.2
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install Backend dependencies
+      working-directory: ./Backend
+      run: npm ci
+
+    - name: Install Frontend dependencies
+      working-directory: ./Frontend
+      run: npm ci
+
+    - name: Build Backend
+      working-directory: ./Backend
+      run: npm run build
+
+    - name: Build Frontend
+      working-directory: ./Frontend
+      run: npm run build
+
+    - name: Start Backend server
+      working-directory: ./Backend
+      run: |
+        npm start &
+        sleep 10
+      env:
+        NODE_ENV: production
+        PORT: 5000
+        MONGODB_URI: mongodb://localhost:27017/brimu-integration
+        REDIS_URL: redis://localhost:6379
+        JWT_SECRET: integration-test-secret
+
+    - name: Run integration tests
+      working-directory: ./Backend
+      run: npm run test:integration || true
+      env:
+        API_URL: http://localhost:5000/api
+
+  # Deployment (only on main branch)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test, security-scan, integration-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install Backend dependencies
+      working-directory: ./Backend
+      run: npm ci
+
+    - name: Install Frontend dependencies
+      working-directory: ./Frontend
+      run: npm ci
+
+    - name: Build Backend
+      working-directory: ./Backend
+      run: npm run build
+
+    - name: Build Frontend
+      working-directory: ./Frontend
+      run: npm run build
+
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your deployment commands here
+        # Example: Deploy to Heroku, AWS, etc.
+
+    - name: Notify deployment
+      uses: 8398a7/action-slack@v3
+      with:
+        status: custom
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'good',
+              text: `✅ Brimu deployed successfully to staging!\nCommit: ${process.env.AS_COMMIT}\nBranch: ${process.env.AS_REF}`
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: success()
+
+    - name: Notify deployment failure
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        text: '❌ Brimu deployment failed!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()
