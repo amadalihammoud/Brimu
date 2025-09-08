@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema({
   // Informações básicas
@@ -273,7 +274,6 @@ userSchema.methods.updateStats = function(type, value) {
 
 // Método para gerar token de reset de senha
 userSchema.methods.generatePasswordResetToken = function() {
-  const crypto = require('crypto');
   const token = crypto.randomBytes(32).toString('hex');
   
   this.security.passwordResetToken = token;
@@ -284,7 +284,6 @@ userSchema.methods.generatePasswordResetToken = function() {
 
 // Método para gerar token de verificação de email
 userSchema.methods.generateEmailVerificationToken = function() {
-  const crypto = require('crypto');
   const token = crypto.randomBytes(32).toString('hex');
   
   this.security.emailVerificationToken = token;
@@ -333,4 +332,5 @@ userSchema.statics.getStats = async function() {
   };
 };
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+export default User;

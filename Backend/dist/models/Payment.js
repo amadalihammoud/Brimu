@@ -1,21 +1,26 @@
-const mongoose = require('mongoose');
-const paymentSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const paymentSchema = new mongoose_1.default.Schema({
     // Referências
     client: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     order: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Order'
     },
     quote: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Quote'
     },
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -110,7 +115,7 @@ const paymentSchema = new mongoose.Schema({
                 default: Date.now
             },
             uploadedBy: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose_1.default.Schema.Types.ObjectId,
                 ref: 'User'
             }
         }],
@@ -154,12 +159,12 @@ const paymentSchema = new mongoose.Schema({
     refund: {
         requestedAt: Date,
         requestedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User'
         },
         processedAt: Date,
         processedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User'
         },
         amount: Number,
@@ -453,4 +458,5 @@ paymentSchema.statics.getStats = async function () {
         overdueAmount: 0
     };
 };
-module.exports = mongoose.model('Payment', paymentSchema);
+const Payment = mongoose_1.default.model('Payment', paymentSchema);
+exports.default = Payment;

@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
-const quoteSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const quoteSchema = new mongoose_1.default.Schema({
     // Referências
     client: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     service: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Service',
         required: true
     },
     order: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Order'
     },
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -212,7 +217,7 @@ const quoteSchema = new mongoose.Schema({
                 askedAt: Date,
                 answeredAt: Date,
                 answeredBy: {
-                    type: mongoose.Schema.Types.ObjectId,
+                    type: mongoose_1.default.Schema.Types.ObjectId,
                     ref: 'User'
                 }
             }]
@@ -221,12 +226,12 @@ const quoteSchema = new mongoose.Schema({
     approval: {
         approvedAt: Date,
         approvedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User'
         },
         rejectedAt: Date,
         rejectedBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User'
         },
         rejectionReason: String,
@@ -505,4 +510,5 @@ quoteSchema.statics.getStats = async function () {
     }
     return result;
 };
-module.exports = mongoose.model('Quote', quoteSchema);
+const Quote = mongoose_1.default.model('Quote', quoteSchema);
+exports.default = Quote;

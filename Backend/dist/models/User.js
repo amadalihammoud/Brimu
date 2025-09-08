@@ -1,6 +1,12 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const userSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const crypto_1 = __importDefault(require("crypto"));
+const userSchema = new mongoose_1.default.Schema({
     // Informações básicas
     name: {
         type: String,
@@ -176,7 +182,7 @@ const userSchema = new mongoose.Schema({
     },
     // Metadados
     metadata: {
-        type: mongoose.Schema.Types.Mixed,
+        type: mongoose_1.default.Schema.Types.Mixed,
         default: {}
     }
 }, {
@@ -217,8 +223,8 @@ userSchema.pre('save', async function (next) {
     if (!this.isModified('password'))
         return next();
     try {
-        const salt = await bcrypt.genSalt(12);
-        this.password = await bcrypt.hash(this.password, salt);
+        const salt = await bcryptjs_1.default.genSalt(12);
+        this.password = await bcryptjs_1.default.hash(this.password, salt);
         next();
     }
     catch (error) {
@@ -227,7 +233,7 @@ userSchema.pre('save', async function (next) {
 });
 // Método para comparar senhas
 userSchema.methods.comparePassword = async function (candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
+    return bcryptjs_1.default.compare(candidatePassword, this.password);
 };
 // Método para verificar permissão
 userSchema.methods.hasPermission = function (permission) {
@@ -261,16 +267,14 @@ userSchema.methods.updateStats = function (type, value) {
 };
 // Método para gerar token de reset de senha
 userSchema.methods.generatePasswordResetToken = function () {
-    const crypto = require('crypto');
-    const token = crypto.randomBytes(32).toString('hex');
+    const token = crypto_1.default.randomBytes(32).toString('hex');
     this.security.passwordResetToken = token;
     this.security.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutos
     return token;
 };
 // Método para gerar token de verificação de email
 userSchema.methods.generateEmailVerificationToken = function () {
-    const crypto = require('crypto');
-    const token = crypto.randomBytes(32).toString('hex');
+    const token = crypto_1.default.randomBytes(32).toString('hex');
     this.security.emailVerificationToken = token;
     this.security.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 horas
     return token;
@@ -311,4 +315,5 @@ userSchema.statics.getStats = async function () {
         totalDownloads: 0
     };
 };
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose_1.default.model('User', userSchema);
+exports.default = User;

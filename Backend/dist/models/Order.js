@@ -1,19 +1,24 @@
-const mongoose = require('mongoose');
-const orderSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const orderSchema = new mongoose_1.default.Schema({
     // Referências
     client: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     service: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'Service',
         required: true
     },
     assignedTeam: [{
             user: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose_1.default.Schema.Types.ObjectId,
                 ref: 'User'
             },
             role: {
@@ -25,7 +30,7 @@ const orderSchema = new mongoose.Schema({
     // Equipamentos atribuídos
     assignedEquipment: [{
             equipment: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose_1.default.Schema.Types.ObjectId,
                 ref: 'Equipment'
             },
             assignedAt: {
@@ -33,7 +38,7 @@ const orderSchema = new mongoose.Schema({
                 default: Date.now
             },
             assignedBy: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose_1.default.Schema.Types.ObjectId,
                 ref: 'User'
             },
             notes: String
@@ -120,7 +125,7 @@ const orderSchema = new mongoose.Schema({
                     default: Date.now
                 },
                 author: {
-                    type: mongoose.Schema.Types.ObjectId,
+                    type: mongoose_1.default.Schema.Types.ObjectId,
                     ref: 'User'
                 }
             }]
@@ -193,7 +198,7 @@ const orderSchema = new mongoose.Schema({
             passed: Boolean,
             notes: String,
             checkedBy: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose_1.default.Schema.Types.ObjectId,
                 ref: 'User'
             },
             checkedAt: Date
@@ -556,4 +561,5 @@ orderSchema.statics.getStats = async function () {
         averageRating: 0
     };
 };
-module.exports = mongoose.model('Order', orderSchema);
+const Order = mongoose_1.default.model('Order', orderSchema);
+exports.default = Order;

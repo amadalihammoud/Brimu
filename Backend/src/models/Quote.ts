@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const quoteSchema = new mongoose.Schema({
   // Referências
@@ -550,4 +550,5 @@ quoteSchema.statics.getStats = async function() {
   return result;
 };
 
-module.exports = mongoose.model('Quote', quoteSchema);
+const Quote = mongoose.model('Quote', quoteSchema);
+export default Quote;

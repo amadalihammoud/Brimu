@@ -53,7 +53,7 @@ router.post('/register', validateUser, async (req, res) => {
         email: user.email, 
         role: user.role 
       },
-      config.auth.jwtSecret,
+      config.auth.jwtSecret as string,
       { expiresIn: config.auth.jwtExpiresIn }
     );
 
@@ -137,7 +137,7 @@ router.post('/login', [
         email: user.email, 
         role: user.role 
       },
-      config.auth.jwtSecret,
+      config.auth.jwtSecret as string,
       { expiresIn: config.auth.jwtExpiresIn }
     );
 
@@ -173,7 +173,7 @@ router.get('/me', async (req, res) => {
       return res.status(401).json({ message: 'Token não fornecido' });
     }
 
-    const decoded = jwt.verify(token, config.auth.jwtSecret);
+    const decoded = jwt.verify(token, config.auth.jwtSecret as string) as jwt.JwtPayload;
     
     // Verificar se MongoDB está disponível
     const { isConnected } = require('../config/database');
@@ -182,7 +182,7 @@ router.get('/me', async (req, res) => {
     
     if (isConnected()) {
       // Usar MongoDB se disponível
-      user = await User.findById(decoded.id).select('-password -security');
+      user = await User.findById((decoded as any).id).select('-password -security');
     } else {
       // Usar usuários de teste se MongoDB não estiver disponível
       const testUsers = [
