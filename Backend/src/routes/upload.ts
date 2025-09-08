@@ -27,7 +27,7 @@ router.post('/image', auth, (imageUpload as any).single('image'), async (req: Re
     
     // Verificar se usuário pode fazer upload
     const user = await User.findById(userId);
-    if (!user.canUpload(req.file.size, 1)) {
+    if (!(user as any).canUpload(req.file.size, 1)) {
       return res.status(403).json({ 
         message: 'Usuário não tem permissão para fazer upload ou arquivo muito grande' 
       });
@@ -386,12 +386,12 @@ router.get('/file/:id', auth, async (req: Request, res: Response) => {
     }
 
     // Verificar permissões
-    if (!file.canAccess(userId, 'read')) {
+    if (!(file as any).canAccess(userId, 'read')) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 
     // Incrementar contador de visualizações
-    await file.incrementView();
+    await (file as any).incrementView();
 
     res.status(200).json({
       message: 'Arquivo encontrado',
@@ -417,7 +417,7 @@ router.put('/file/:id', auth, async (req: Request, res: Response) => {
     }
 
     // Verificar permissões
-    if (!file.canAccess(userId, 'write')) {
+    if (!(file as any).canAccess(userId, 'write')) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 
@@ -451,7 +451,7 @@ router.get('/download/:id', auth, async (req: Request, res: Response) => {
     }
 
     // Verificar permissões
-    if (!file.canAccess(userId, 'read')) {
+    if (!(file as any).canAccess(userId, 'read')) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 
@@ -463,7 +463,7 @@ router.get('/download/:id', auth, async (req: Request, res: Response) => {
     }
 
     // Incrementar contador de downloads
-    await file.incrementDownload();
+    await (file as any).incrementDownload();
 
     // Definir headers para download
     res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);

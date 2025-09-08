@@ -296,7 +296,7 @@ router.put('/:id/cancel', async (req, res) => {
                 message: 'Não é possível cancelar pagamentos já processados'
             });
         }
-        await payment.cancel(cancelledBy, reason);
+        await payment.cancel(reason, cancelledBy);
         // Buscar pagamento atualizado
         const updatedPayment = await models_1.Payment.findById(payment._id)
             .populate('client', 'name email phone')

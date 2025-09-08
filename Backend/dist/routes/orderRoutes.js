@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("../types/mongoose-fix");
-const mongoose_fix_1 = require("../types/mongoose-fix");
+const queryHelpers_1 = require("../utils/queryHelpers");
 const models_1 = require("../models");
 const router = express_1.default.Router();
 // GET /api/orders - Listar todas as ordens
@@ -15,13 +15,13 @@ router.get('/', async (req, res) => {
         // Construir filtros
         const filters = {};
         if (status)
-            filters.status = (0, mongoose_fix_1.parseStringParam)(status);
+            filters.status = (0, queryHelpers_1.parseStringParam)(status);
         if (client)
-            filters.client = (0, mongoose_fix_1.parseStringParam)(client);
+            filters.client = (0, queryHelpers_1.parseStringParam)(client);
         if (service)
-            filters.service = (0, mongoose_fix_1.parseStringParam)(service);
-        const limitNum = (0, mongoose_fix_1.parseNumberParam)(limit) || 50;
-        const pageNum = (0, mongoose_fix_1.parseNumberParam)(page) || 1;
+            filters.service = (0, queryHelpers_1.parseStringParam)(service);
+        const limitNum = (0, queryHelpers_1.parseNumberParam)(limit) || 50;
+        const pageNum = (0, queryHelpers_1.parseNumberParam)(page) || 1;
         const skip = (pageNum - 1) * limitNum;
         const orders = await models_1.Order.find(filters)
             .populate('client', 'name email phone')
@@ -37,9 +37,9 @@ router.get('/', async (req, res) => {
             data: orders,
             pagination: {
                 total,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                pages: Math.ceil(total / parseInt(limit))
+                page: (0, queryHelpers_1.parseNumberParam)(page),
+                limit: (0, queryHelpers_1.parseNumberParam)(limit),
+                pages: Math.ceil(total / (0, queryHelpers_1.parseNumberParam)(limit))
             }
         });
     }
@@ -62,7 +62,7 @@ router.get('/available-equipment', async (req, res) => {
                 message: 'Data agendada é obrigatória'
             });
         }
-        const availableEquipment = await models_1.Order.getAvailableEquipment(new Date(scheduledDate), excludeOrderId);
+        const availableEquipment = await models_1.Order.getAvailableEquipment((0, queryHelpers_1.parseDateParam)(scheduledDate), excludeOrderId);
         res.json({
             success: true,
             data: availableEquipment,
@@ -88,7 +88,7 @@ router.get('/equipment-conflicts/:equipmentId', async (req, res) => {
                 message: 'Data agendada é obrigatória'
             });
         }
-        const conflicts = await models_1.Order.checkEquipmentDateConflict(req.params.equipmentId, new Date(scheduledDate), excludeOrderId);
+        const conflicts = await models_1.Order.checkEquipmentDateConflict(req.params.equipmentId, (0, queryHelpers_1.parseDateParam)(scheduledDate), excludeOrderId);
         res.json({
             success: true,
             hasConflicts: conflicts.length > 0,
@@ -263,7 +263,7 @@ router.put('/:id/status', async (req, res) => {
                 message: 'Ordem não encontrada'
             });
         }
-        await order.updateStatus(status, notes);
+        await order.updateStatus(status);
         // Buscar ordem atualizada
         const updatedOrder = await models_1.Order.findById(order._id)
             .populate('client', 'name email phone')
@@ -331,7 +331,7 @@ router.get('/scheduled', async (req, res) => {
                 message: 'Data de início e fim são obrigatórias'
             });
         }
-        const orders = await models_1.Order.findScheduled(new Date(startDate), new Date(endDate));
+        const orders = await models_1.Order.findScheduled((0, queryHelpers_1.parseDateParam)(startDate), (0, queryHelpers_1.parseDateParam)(endDate));
         res.json({
             success: true,
             data: orders,
@@ -404,7 +404,7 @@ router.post('/:id/equipment', async (req, res) => {
             });
         }
         // Atribuir equipamento à ordem
-        await order.assignEquipment(equipmentId, assignedBy, notes);
+        await order.assignEquipment(equipmentId);
         // Atualizar equipamento
         equipment.assignedOrder = order._id;
         await equipment.save();

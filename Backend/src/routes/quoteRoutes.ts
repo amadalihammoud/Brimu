@@ -290,7 +290,7 @@ router.put('/:id/approve', async (req, res) => {
       });
     }
     
-    await quote.approve(approvedBy, clientFeedback);
+    await (quote as any).approve(approvedBy, clientFeedback);
     
     // Buscar orçamento atualizado
     const updatedQuote = await Quote.findById(quote._id)
@@ -333,7 +333,7 @@ router.put('/:id/reject', async (req, res) => {
       });
     }
     
-    await quote.reject(rejectedBy, reason, clientFeedback);
+    await (quote as any).reject(reason);
     
     // Buscar orçamento atualizado
     const updatedQuote = await Quote.findById(quote._id)
@@ -401,7 +401,7 @@ router.put('/:id/send', async (req, res) => {
 // GET /api/quotes/client/:clientId - Buscar orçamentos por cliente
 router.get('/client/:clientId', async (req, res) => {
   try {
-    const quotes = await Quote.findByClient(req.params.clientId);
+    const quotes = await (Quote as any).findByClient(req.params.clientId);
     
     res.json({
       success: true,
@@ -421,7 +421,7 @@ router.get('/client/:clientId', async (req, res) => {
 // GET /api/quotes/status/:status - Buscar orçamentos por status
 router.get('/status/:status', async (req, res) => {
   try {
-    const quotes = await Quote.findByStatus(req.params.status);
+    const quotes = await (Quote as any).findByStatus(req.params.status);
     
     res.json({
       success: true,
@@ -441,7 +441,7 @@ router.get('/status/:status', async (req, res) => {
 // GET /api/quotes/expired - Buscar orçamentos expirados
 router.get('/expired', async (req, res) => {
   try {
-    const quotes = await Quote.findExpired();
+    const quotes = await (Quote as any).findExpired();
     
     res.json({
       success: true,
@@ -461,8 +461,8 @@ router.get('/expired', async (req, res) => {
 // GET /api/quotes/expiring-soon - Buscar orçamentos próximos do vencimento
 router.get('/expiring-soon', async (req, res) => {
   try {
-    const days = parseInt(req.query.days) || 3;
-    const quotes = await Quote.findExpiringSoon(days);
+    const days = parseNumberParam(req.query.days) || 3;
+    const quotes = await (Quote as any).findExpiringSoon(days);
     
     res.json({
       success: true,
@@ -482,7 +482,7 @@ router.get('/expiring-soon', async (req, res) => {
 // GET /api/quotes/stats - Estatísticas dos orçamentos
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await Quote.getStats();
+    const stats = await (Quote as any).getStats();
     
     res.json({
       success: true,
@@ -539,13 +539,13 @@ router.post('/:id/convert-to-order', async (req, res) => {
       serviceDetails: {
         name: quote.title,
         description: quote.description,
-        category: quote.service.category,
-        estimatedDuration: quote.service.estimatedDuration || quote.estimatedDuration,
+        category: (quote.service as any).category,
+        estimatedDuration: (quote.service as any).estimatedDuration || (quote as any).estimatedDuration,
         basePrice: quote.totalAmount
       },
       location: quote.location || {},
       scheduling: {
-        preferredDate: quote.preferredDate || new Date(),
+        preferredDate: (quote as any).preferredDate || new Date(),
         preferredTimeSlot: 'manha'
       },
       pricing: {

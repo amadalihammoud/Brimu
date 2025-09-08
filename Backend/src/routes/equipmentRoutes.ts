@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { parseStringParam, parseNumberParam } from '../utils/queryHelpers';
 import Equipment from '../models/Equipment';
 import { auth } from '../middleware/auth';
 
@@ -51,7 +52,7 @@ const calculateDaysUntilMaintenance = (equipment) => {
   if (!equipment.maintenance?.nextMaintenance) return null;
   const today = new Date();
   const nextMaintenance = new Date(equipment.maintenance.nextMaintenance);
-  const diffTime = nextMaintenance - today;
+  const diffTime = (nextMaintenance as any) - (today as any);
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
@@ -67,23 +68,23 @@ const getMaintenanceStatus = (equipment) => {
 // GET /api/equipment - Listar equipamentos com filtros otimizados
 router.get('/', (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const page = parseNumberParam(req.query.page) || 1;
+    const limit = parseNumberParam(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
     let filtered = equipmentStorage.filter(eq => eq.isActive);
     
     // Aplicar filtros
     if (req.query.status) {
-      filtered = filtered.filter(eq => eq.status === req.query.status);
+      filtered = filtered.filter(eq => eq.status === parseStringParam(req.query.status));
     }
     
     if (req.query.category) {
-      filtered = filtered.filter(eq => eq.category === req.query.category);
+      filtered = filtered.filter(eq => eq.category === parseStringParam(req.query.category));
     }
     
     if (req.query.search) {
-      const search = req.query.search.toLowerCase();
+      const search = parseStringParam(req.query.search).toLowerCase();
       filtered = filtered.filter(eq => 
         eq.name.toLowerCase().includes(search) ||
         eq.code.toLowerCase().includes(search) ||
@@ -131,7 +132,7 @@ router.get('/stats/overview', (req, res) => {
       manutencao: activeEquipments.filter(eq => eq.status === 'manutencao').length,
       inativo: activeEquipments.filter(eq => eq.status === 'inativo').length,
       aposentado: activeEquipments.filter(eq => eq.status === 'aposentado').length,
-      assigned: activeEquipments.filter(eq => eq.assignedTo).length,
+      assigned: activeEquipments.filter(eq => (eq as any).assignedTo).length,
       maintenance: {
         overdue: activeEquipments.filter(eq => getMaintenanceStatus(eq) === 'vencida').length,
         due_soon: activeEquipments.filter(eq => getMaintenanceStatus(eq) === 'proxima').length
@@ -257,11 +258,11 @@ router.put('/:id', (req, res) => {
     
     allowedFields.forEach(field => {
       if (req.body[field] !== undefined) {
-        equipment[field] = req.body[field];
+        (equipment as any)[field] = req.body[field];
       }
     });
 
-    equipment.updatedAt = new Date();
+    (equipment as any).updatedAt = new Date();
     equipmentStorage[equipmentIndex] = equipment;
 
     res.json({
@@ -290,14 +291,14 @@ router.delete('/:id', (req, res) => {
     const equipment = equipmentStorage[equipmentIndex];
 
     // Verificar se está em uso
-    if (equipment.assignedOrder) {
+    if ((equipment as any).assignedOrder) {
       return res.status(400).json({
         message: 'Não é possível desativar equipamento que está em uso'
       });
     }
 
-    equipment.isActive = false;
-    equipment.deactivatedAt = new Date();
+    (equipment as any).isActive = false;
+    (equipment as any).deactivatedAt = new Date();
     equipmentStorage[equipmentIndex] = equipment;
 
     res.json({ message: 'Equipamento desativado com sucesso' });
@@ -323,9 +324,9 @@ router.post('/:id/assign', (req, res) => {
     const { assignedTo, assignedOrder } = req.body;
     const equipment = equipmentStorage[equipmentIndex];
 
-    equipment.assignedTo = assignedTo;
-    equipment.assignedOrder = assignedOrder;
-    equipment.updatedAt = new Date();
+    (equipment as any).assignedTo = assignedTo;
+    (equipment as any).assignedOrder = assignedOrder;
+    (equipment as any).updatedAt = new Date();
 
     equipmentStorage[equipmentIndex] = equipment;
 
@@ -353,9 +354,9 @@ router.post('/:id/release', (req, res) => {
     }
 
     const equipment = equipmentStorage[equipmentIndex];
-    equipment.assignedTo = null;
-    equipment.assignedOrder = null;
-    equipment.updatedAt = new Date();
+    (equipment as any).assignedTo = null;
+    (equipment as any).assignedOrder = null;
+    (equipment as any).updatedAt = new Date();
 
     equipmentStorage[equipmentIndex] = equipment;
 
@@ -402,17 +403,17 @@ router.post('/:id/maintenance', (req, res) => {
     };
 
     const equipment = equipmentStorage[equipmentIndex];
-    equipment.maintenance.maintenanceHistory.push(maintenanceRecord);
-    equipment.maintenance.lastMaintenance = new Date();
+    (equipment as any).maintenance.maintenanceHistory.push(maintenanceRecord);
+    (equipment as any).maintenance.lastMaintenance = new Date();
 
     // Se for preventiva, agendar próxima
     if (type === 'preventiva') {
       const nextDate = new Date();
-      nextDate.setDate(nextDate.getDate() + equipment.maintenance.preventiveInterval);
-      equipment.maintenance.nextMaintenance = nextDate;
+      nextDate.setDate(nextDate.getDate() + (equipment as any).maintenance.preventiveInterval);
+      (equipment as any).maintenance.nextMaintenance = nextDate;
     }
 
-    equipment.updatedAt = new Date();
+    (equipment as any).updatedAt = new Date();
     equipmentStorage[equipmentIndex] = equipment;
 
     res.json({

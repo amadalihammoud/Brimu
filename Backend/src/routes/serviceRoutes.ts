@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Service } from '../models';
-import { parseStringParam, parseBooleanParam, QueryParams } from '../utils/queryHelpers';
+import { parseStringParam, parseBooleanParam, parseNumberParam, QueryParams } from '../utils/queryHelpers';
 
 const router = express.Router();
 
@@ -172,7 +172,7 @@ router.delete('/:id', async (req, res) => {
 // GET /api/services/category/:category - Buscar serviços por categoria
 router.get('/category/:category', async (req, res) => {
   try {
-    const services = await Service.findByCategory(req.params.category);
+    const services = await (Service as any).findByCategory(req.params.category);
     
     res.json({
       success: true,
@@ -192,8 +192,8 @@ router.get('/category/:category', async (req, res) => {
 // GET /api/services/popular - Buscar serviços populares
 router.get('/popular', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
-    const services = await Service.findPopular(limit);
+    const limit = parseNumberParam(req.query.limit) || 10;
+    const services = await (Service as any).findPopular(limit);
     
     res.json({
       success: true,
@@ -213,7 +213,7 @@ router.get('/popular', async (req, res) => {
 // GET /api/services/stats - Estatísticas dos serviços
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await Service.getStats();
+    const stats = await (Service as any).getStats();
     
     res.json({
       success: true,

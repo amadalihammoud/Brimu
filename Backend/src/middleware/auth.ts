@@ -11,7 +11,14 @@ interface CustomJwtPayload extends JwtPayload {
 declare global {
   namespace Express {
     interface Request {
-      user?: CustomJwtPayload;
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+        iat?: number;
+        exp?: number;
+        [key: string]: any;
+      };
     }
   }
 }

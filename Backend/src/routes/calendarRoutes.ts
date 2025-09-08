@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { parseStringParam, parseDateParam } from '../utils/queryHelpers';
 
 const router = express.Router();
 
@@ -256,8 +257,8 @@ router.get('/', (req, res) => {
     
     // Filtrar por período se especificado
     if (startDate || endDate) {
-      const start = startDate ? new Date(startDate) : new Date('1900-01-01');
-      const end = endDate ? new Date(endDate) : new Date('2099-12-31');
+      const start = startDate ? parseDateParam(startDate) : new Date('1900-01-01');
+      const end = endDate ? parseDateParam(endDate) : new Date('2099-12-31');
       
       filteredEvents = filteredEvents.filter(event => {
         const eventStart = new Date(event.startDate);
@@ -296,7 +297,7 @@ router.get('/', (req, res) => {
     }
     
     // Ordenar por data de início
-    filteredEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    filteredEvents.sort((a, b) => (new Date(a.startDate) as any) - (new Date(b.startDate) as any));
     
     // Popular dados relacionados
     const populatedEvents = filteredEvents.map(populateEvent);
@@ -537,7 +538,7 @@ router.put('/:id', (req, res) => {
       ...updates,
       lastModifiedBy: 'current-user',
       updatedAt: new Date(),
-      changes: [...(currentEvent.changes || []), ...changes]
+      changes: [...((currentEvent as any).changes || []), ...changes]
     };
     
     calendarEvents[eventIndex] = updatedEvent;
@@ -607,13 +608,13 @@ router.post('/:id/status', (req, res) => {
     
     // Atualizar status
     event.status = status;
-    event.lastModifiedBy = 'current-user';
-    event.updatedAt = new Date();
+    (event as any).lastModifiedBy = 'current-user';
+    (event as any).updatedAt = new Date();
     
     // Adicionar nota se fornecida
     if (notes) {
-      event.notes = event.notes || [];
-      event.notes.push({
+      (event as any).notes = (event as any).notes || [];
+      (event as any).notes.push({
         text: notes,
         author: 'current-user',
         createdAt: new Date()
@@ -621,8 +622,8 @@ router.post('/:id/status', (req, res) => {
     }
     
     // Registrar mudança
-    event.changes = event.changes || [];
-    event.changes.push({
+    (event as any).changes = (event as any).changes || [];
+    (event as any).changes.push({
       field: 'status',
       oldValue: oldStatus,
       newValue: status,
@@ -657,7 +658,7 @@ router.get('/upcoming/:days', (req, res) => {
       return eventStart >= now && 
              eventStart <= futureDate && 
              event.status !== 'cancelado';
-    }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    }).sort((a, b) => (new Date(a.startDate) as any) - (new Date(b.startDate) as any));
     
     const populatedEvents = upcomingEvents.map(populateEvent);
     

@@ -302,7 +302,7 @@ router.put('/:id/reject', async (req, res) => {
                 message: 'Apenas orçamentos enviados podem ser rejeitados'
             });
         }
-        await quote.reject(rejectedBy, reason, clientFeedback);
+        await quote.reject(reason);
         // Buscar orçamento atualizado
         const updatedQuote = await models_1.Quote.findById(quote._id)
             .populate('client', 'name email phone')
@@ -420,7 +420,7 @@ router.get('/expired', async (req, res) => {
 // GET /api/quotes/expiring-soon - Buscar orçamentos próximos do vencimento
 router.get('/expiring-soon', async (req, res) => {
     try {
-        const days = parseInt(req.query.days) || 3;
+        const days = (0, queryHelpers_1.parseNumberParam)(req.query.days) || 3;
         const quotes = await models_1.Quote.findExpiringSoon(days);
         res.json({
             success: true,

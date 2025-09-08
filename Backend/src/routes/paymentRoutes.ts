@@ -281,7 +281,7 @@ router.put('/:id/mark-paid', async (req, res) => {
       });
     }
     
-    await payment.markAsPaid(paidBy, notes);
+    await (payment as any).markAsPaid(paidBy, notes);
     
     // Buscar pagamento atualizado
     const updatedPayment = await Payment.findById(payment._id)
@@ -324,7 +324,7 @@ router.put('/:id/cancel', async (req, res) => {
       });
     }
     
-    await payment.cancel(cancelledBy, reason);
+    await (payment as any).cancel(reason, cancelledBy);
     
     // Buscar pagamento atualizado
     const updatedPayment = await Payment.findById(payment._id)
@@ -360,7 +360,7 @@ router.post('/:id/receipt', async (req, res) => {
       });
     }
     
-    await payment.addReceipt({
+    await (payment as any).addReceipt({
       type,
       url,
       filename,
@@ -408,7 +408,7 @@ router.post('/:id/request-refund', async (req, res) => {
       });
     }
     
-    await payment.requestRefund(requestedBy, reason, amount);
+    await (payment as any).requestRefund(requestedBy, reason, amount);
     
     // Buscar pagamento atualizado
     const updatedPayment = await Payment.findById(payment._id)
@@ -433,7 +433,7 @@ router.post('/:id/request-refund', async (req, res) => {
 // GET /api/payments/client/:clientId - Buscar pagamentos por cliente
 router.get('/client/:clientId', async (req, res) => {
   try {
-    const payments = await Payment.findByClient(req.params.clientId);
+    const payments = await (Payment as any).findByClient(req.params.clientId);
     
     res.json({
       success: true,
@@ -453,7 +453,7 @@ router.get('/client/:clientId', async (req, res) => {
 // GET /api/payments/status/:status - Buscar pagamentos por status
 router.get('/status/:status', async (req, res) => {
   try {
-    const payments = await Payment.findByStatus(req.params.status);
+    const payments = await (Payment as any).findByStatus(req.params.status);
     
     res.json({
       success: true,
@@ -473,7 +473,7 @@ router.get('/status/:status', async (req, res) => {
 // GET /api/payments/overdue - Buscar pagamentos vencidos
 router.get('/overdue', async (req, res) => {
   try {
-    const payments = await Payment.findOverdue();
+    const payments = await (Payment as any).findOverdue();
     
     res.json({
       success: true,
@@ -494,7 +494,7 @@ router.get('/overdue', async (req, res) => {
 router.get('/due-soon', async (req, res) => {
   try {
     const days = parseNumberParam(req.query.days) || 3;
-    const payments = await Payment.findDueSoon(days);
+    const payments = await (Payment as any).findDueSoon(days);
     
     res.json({
       success: true,
@@ -514,7 +514,7 @@ router.get('/due-soon', async (req, res) => {
 // GET /api/payments/stats - Estatísticas dos pagamentos
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await Payment.getStats();
+    const stats = await (Payment as any).getStats();
     
     res.json({
       success: true,

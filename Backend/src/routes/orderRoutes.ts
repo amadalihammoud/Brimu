@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import '../types/mongoose-fix';
-import { parseStringParam, parseNumberParam } from '../types/mongoose-fix';
+import { parseStringParam, parseNumberParam, parseDateParam } from '../utils/queryHelpers';
 import { Order, Service, User, Equipment } from '../models';
 
 const router = express.Router();
@@ -36,9 +36,9 @@ router.get('/', async (req, res) => {
       data: orders,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        pages: Math.ceil(total / parseInt(limit))
+        page: parseNumberParam(page),
+        limit: parseNumberParam(limit),
+        pages: Math.ceil(total / parseNumberParam(limit))
       }
     });
   } catch (error) {
@@ -63,8 +63,8 @@ router.get('/available-equipment', async (req, res) => {
       });
     }
     
-    const availableEquipment = await Order.getAvailableEquipment(
-      new Date(scheduledDate), 
+    const availableEquipment = await (Order as any).getAvailableEquipment(
+      parseDateParam(scheduledDate), 
       excludeOrderId
     );
     
@@ -95,9 +95,9 @@ router.get('/equipment-conflicts/:equipmentId', async (req, res) => {
       });
     }
     
-    const conflicts = await Order.checkEquipmentDateConflict(
+    const conflicts = await (Order as any).checkEquipmentDateConflict(
       req.params.equipmentId,
-      new Date(scheduledDate),
+      parseDateParam(scheduledDate),
       excludeOrderId
     );
     
@@ -296,7 +296,7 @@ router.put('/:id/status', async (req, res) => {
       });
     }
     
-    await order.updateStatus(status, notes);
+    await (order as any).updateStatus(status);
     
     // Buscar ordem atualizada
     const updatedOrder = await Order.findById(order._id)
@@ -321,7 +321,7 @@ router.put('/:id/status', async (req, res) => {
 // GET /api/orders/client/:clientId - Buscar ordens por cliente
 router.get('/client/:clientId', async (req, res) => {
   try {
-    const orders = await Order.findByClient(req.params.clientId);
+    const orders = await (Order as any).findByClient(req.params.clientId);
     
     res.json({
       success: true,
@@ -341,7 +341,7 @@ router.get('/client/:clientId', async (req, res) => {
 // GET /api/orders/status/:status - Buscar ordens por status
 router.get('/status/:status', async (req, res) => {
   try {
-    const orders = await Order.findByStatus(req.params.status);
+    const orders = await (Order as any).findByStatus(req.params.status);
     
     res.json({
       success: true,
@@ -370,7 +370,7 @@ router.get('/scheduled', async (req, res) => {
       });
     }
     
-    const orders = await Order.findScheduled(new Date(startDate), new Date(endDate));
+    const orders = await (Order as any).findScheduled(parseDateParam(startDate), parseDateParam(endDate));
     
     res.json({
       success: true,
@@ -390,7 +390,7 @@ router.get('/scheduled', async (req, res) => {
 // GET /api/orders/stats - Estatísticas das ordens
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await Order.getStats();
+    const stats = await (Order as any).getStats();
     
     res.json({
       success: true,
@@ -451,10 +451,10 @@ router.post('/:id/equipment', async (req, res) => {
     }
     
     // Atribuir equipamento à ordem
-    await order.assignEquipment(equipmentId, assignedBy, notes);
+    await (order as any).assignEquipment(equipmentId);
     
     // Atualizar equipamento
-    equipment.assignedOrder = order._id;
+    (equipment as any).assignedOrder = order._id;
     await equipment.save();
     
     // Buscar ordem atualizada
@@ -525,7 +525,7 @@ router.delete('/:id/equipment/:equipmentId', async (req, res) => {
 // GET /api/orders/equipment/:equipmentId - Buscar ordens por equipamento
 router.get('/equipment/:equipmentId', async (req, res) => {
   try {
-    const orders = await Order.findByEquipment(req.params.equipmentId);
+    const orders = await (Order as any).findByEquipment(req.params.equipmentId);
     
     res.json({
       success: true,

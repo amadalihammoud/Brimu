@@ -180,7 +180,7 @@ router.get('/category/:category', async (req, res) => {
 // GET /api/services/popular - Buscar serviços populares
 router.get('/popular', async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = (0, queryHelpers_1.parseNumberParam)(req.query.limit) || 10;
         const services = await models_1.Service.findPopular(limit);
         res.json({
             success: true,
