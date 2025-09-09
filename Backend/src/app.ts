@@ -175,14 +175,14 @@ const startServer = async (): Promise<void> => {
     const dbConnected = await connectDB();
     
     // Iniciar servidor
-    const server = app.listen(PORT, config.server.host as string, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log('='.repeat(50));
       console.log(`🚀 Servidor Brimu rodando!`);
-      console.log(`🔗 URL: http://${config.server.host}:${PORT}`);
-      console.log(`📊 Health: http://${config.server.host}:${PORT}/api/health`);
-      console.log(`📈 Status: http://${config.server.host}:${PORT}/api/status`);
-      console.log(`📤 Uploads: http://${config.server.host}:${PORT}/uploads`);
-      console.log(`🌐 Público: http://${config.server.host}:${PORT}/public`);
+      console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
+      console.log(`📊 Health: http://0.0.0.0:${PORT}/api/health`);
+      console.log(`📈 Status: http://0.0.0.0:${PORT}/api/status`);
+      console.log(`📤 Uploads: http://0.0.0.0:${PORT}/uploads`);
+      console.log(`🌐 Público: http://0.0.0.0:${PORT}/public`);
       console.log(`🗄️ Database: ${dbConnected ? 'Conectado' : 'Modo Teste'}`);
       console.log('='.repeat(50));
     });

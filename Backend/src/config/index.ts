@@ -7,7 +7,7 @@ const config = {
   // Configurações do servidor
   server: {
     port: process.env.PORT || 5000,
-    host: process.env.HOST || 'localhost',
+    host: process.env.HOST || '0.0.0.0',
     environment: process.env.NODE_ENV || 'development',
     corsOrigins: [
       'http://localhost:3000',
