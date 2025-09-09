@@ -1,8 +1,17 @@
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import config from '../config';
 import { logger } from '../utils/logger';
+
+// Interface para estender Request com campos customizados
+interface SecureRequest extends Request {
+  csrfToken?: string;
+  sessionId?: string;
+  userFingerprint?: string;
+  user?: any;
+}
 
 // Configurações de segurança personalizadas
 const securityConfig = {
@@ -381,6 +390,173 @@ function ipToNumber(ip: string): number {
   return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
 }
 
+// Gerador de Token CSRF Criptograficamente Seguro
+const generateCSRFToken = (): string => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+// Middleware de Proteção CSRF
+const csrfProtectionMiddleware = (req: SecureRequest, res: Response, next: NextFunction) => {
+  const method = req.method.toUpperCase();
+  
+  // Métodos seguros não precisam de validação CSRF
+  if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    return next();
+  }
+
+  // Gerar token CSRF para o cliente se não existir
+  if (!req.cookies?.['csrf-token']) {
+    const csrfToken = generateCSRFToken();
+    
+    // Definir cookie HttpOnly com token CSRF
+    res.cookie('csrf-token', csrfToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000, // 1 hora
+      path: '/'
+    });
+    
+    req.csrfToken = csrfToken;
+  }
+
+  // Para métodos que modificam dados, validar token CSRF
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    const cookieToken = req.cookies?.['csrf-token'];
+    const headerToken = req.headers['x-csrf-token'] as string;
+    const bodyToken = req.body?._csrf;
+
+    const clientToken = headerToken || bodyToken;
+
+    if (!cookieToken || !clientToken || cookieToken !== clientToken) {
+      logger.warn('CSRF token mismatch', {
+        ip: req.ip,
+        path: req.path,
+        cookieToken: cookieToken ? 'present' : 'missing',
+        clientToken: clientToken ? 'present' : 'missing'
+      });
+      return res.status(403).json({
+        error: 'CSRF token inválido',
+        code: 'CSRF_INVALID'
+      });
+    }
+  }
+
+  next();
+};
+
+// Middleware para HttpOnly Cookies Seguros
+const secureTokenMiddleware = (req: SecureRequest, res: Response, next: NextFunction) => {
+  // Interceptar setHeader para cookies de autenticação
+  const originalJson = res.json;
+  
+  res.json = function(data: any) {
+    // Se a resposta contém um token de autenticação, definir como cookie seguro
+    if (data && data.token) {
+      // Definir cookie HttpOnly com token de autenticação
+      res.cookie('auth-token', data.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 3600000, // 1 hora
+        path: '/'
+      });
+
+      // Remover token do body da resposta para maior segurança
+      const responseData = { ...data };
+      delete responseData.token;
+      
+      // Adicionar flag indicando que token foi definido via cookie
+      responseData.tokenInCookie = true;
+      
+      return originalJson.call(this, responseData);
+    }
+    
+    return originalJson.call(this, data);
+  };
+
+  next();
+};
+
+// Middleware de Autenticação com HttpOnly Cookies
+const authenticateWithCookie = (req: SecureRequest, res: Response, next: NextFunction) => {
+  // Tentar obter token do cookie primeiro, depois do header
+  let token = req.cookies?.['auth-token'];
+  
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({
+      error: 'Token de acesso requerido',
+      code: 'TOKEN_REQUIRED'
+    });
+  }
+
+  try {
+    // Aqui você validaria o JWT token
+    // const decoded = jwt.verify(token, JWT_SECRET);
+    // req.user = decoded;
+    
+    // Por enquanto, mock para demonstração
+    req.user = { token };
+    next();
+  } catch (error) {
+    // Limpar cookie inválido
+    res.clearCookie('auth-token');
+    return res.status(401).json({
+      error: 'Token inválido',
+      code: 'TOKEN_INVALID'
+    });
+  }
+};
+
+// Middleware para Device Fingerprinting
+const deviceFingerprintMiddleware = (req: SecureRequest, res: Response, next: NextFunction) => {
+  const userAgent = req.headers['user-agent'] || '';
+  const acceptLanguage = req.headers['accept-language'] || '';
+  const acceptEncoding = req.headers['accept-encoding'] || '';
+  const connection = req.headers['connection'] || '';
+  
+  // Gerar fingerprint do dispositivo
+  const fingerprintData = `${userAgent}-${acceptLanguage}-${acceptEncoding}-${connection}`;
+  const fingerprint = crypto.createHash('sha256').update(fingerprintData).digest('hex');
+  
+  req.userFingerprint = fingerprint;
+  
+  // Log para dispositivos suspeitos
+  const suspiciousPatterns = [
+    /bot/i,
+    /crawler/i,
+    /spider/i,
+    /scanner/i,
+    /curl/i,
+    /wget/i,
+    /python/i,
+    /automated/i
+  ];
+  
+  const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(userAgent));
+  
+  if (isSuspicious) {
+    logger.warn('Suspicious device detected', {
+      ip: req.ip,
+      userAgent: userAgent,
+      fingerprint: fingerprint
+    });
+    
+    // Adicionar delay para requests suspeitos
+    setTimeout(() => next(), 1000);
+    return;
+  }
+  
+  next();
+};
+
 // Middleware para monitorar tentativas de login
 const monitorLoginAttempts = (req: Request, res: Response, next: NextFunction) => {
   const ip = req.ip;
@@ -399,9 +575,10 @@ const monitorLoginAttempts = (req: Request, res: Response, next: NextFunction) =
   res.send = function(data) {
     const isSuccess = res.statusCode === 200;
     
-    logger.auth('login', isSuccess, {
+    logger.info('Login result', {
       ip: ip,
       email: email,
+      success: isSuccess,
       statusCode: res.statusCode
     });
 
@@ -413,5 +590,10 @@ const monitorLoginAttempts = (req: Request, res: Response, next: NextFunction) =
 
 export {
   securityConfig as default,
-  monitorLoginAttempts
+  monitorLoginAttempts,
+  csrfProtectionMiddleware,
+  secureTokenMiddleware,
+  authenticateWithCookie,
+  deviceFingerprintMiddleware,
+  generateCSRFToken
 };

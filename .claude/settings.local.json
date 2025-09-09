@@ -33,7 +33,9 @@
       "Bash(git push:*)",
       "Bash(ren:*)",
       "Bash(mv:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

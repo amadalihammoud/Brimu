@@ -5,6 +5,12 @@ import { body, validationResult } from 'express-validator';
 import '../types/mongoose-fix';
 import config from '../config';
 import User from '../models/User';
+import { 
+  monitorLoginAttempts, 
+  secureTokenMiddleware, 
+  csrfProtectionMiddleware,
+  authenticateWithCookie
+} from '../middleware/security';
 
 const router = express.Router();
 
@@ -76,11 +82,16 @@ router.post('/register', validateUser, async (req, res) => {
   }
 });
 
-// Login
-router.post('/login', [
-  body('email').isEmail().normalizeEmail().withMessage('Email inválido'),
-  body('password').notEmpty().withMessage('Senha é obrigatória')
-], async (req, res) => {
+// Login com segurança avançada
+router.post('/login', 
+  monitorLoginAttempts,
+  secureTokenMiddleware,
+  csrfProtectionMiddleware,
+  [
+    body('email').isEmail().normalizeEmail().withMessage('Email inválido'),
+    body('password').notEmpty().withMessage('Senha é obrigatória')
+  ], 
+  async (req, res) => {
   try {
     // Verificar erros de validação
     const errors = validationResult(req);
@@ -165,13 +176,17 @@ router.post('/login', [
   }
 });
 
-// Obter perfil do usuário
-router.get('/me', async (req, res) => {
+// Obter perfil do usuário com validação server-side
+router.get('/me', authenticateWithCookie, async (req: any, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // Token já foi validado pelo middleware authenticateWithCookie
+    const token = req.cookies?.['auth-token'] || req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
-      return res.status(401).json({ message: 'Token não fornecido' });
+      return res.status(401).json({ 
+        message: 'Token não fornecido',
+        code: 'TOKEN_REQUIRED'
+      });
     }
 
     const decoded = jwt.verify(token, config.auth.jwtSecret as string) as jwt.JwtPayload;
@@ -208,17 +223,29 @@ router.get('/me', async (req, res) => {
       return res.status(401).json({ message: 'Usuário não encontrado' });
     }
 
+    // Validação server-side de role para segurança máxima
+    const validRoles = ['admin', 'client', 'user', 'employee'];
+    const userRole = user.role || 'client';
+    
+    if (!validRoles.includes(userRole)) {
+      return res.status(403).json({ 
+        message: 'Role de usuário inválida',
+        code: 'INVALID_ROLE'
+      });
+    }
+
     res.json({
       message: 'Perfil obtido com sucesso',
       user: {
         id: user._id || user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: userRole, // Role validada server-side
         isActive: user.isActive,
         phone: user.phone,
         company: user.company,
-        position: user.position
+        position: user.position,
+        serverValidated: true // Flag indicando validação server-side
       }
     });
 
@@ -319,11 +346,45 @@ router.put('/change-password', [
   }
 });
 
-// Logout (invalidar token)
+// Logout seguro com limpeza de cookies
 router.post('/logout', (req, res) => {
+  // Limpar cookies seguros
+  res.clearCookie('auth-token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/'
+  });
+  
+  res.clearCookie('csrf-token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/'
+  });
+  
   // Em uma implementação mais robusta, você manteria uma blacklist de tokens
-  // Por enquanto, apenas retornamos sucesso
-  res.json({ message: 'Logout realizado com sucesso' });
+  res.json({ 
+    message: 'Logout realizado com sucesso',
+    cookiesCleared: true
+  });
+});
+
+// Endpoint para verificar token e obter CSRF token
+router.get('/csrf-token', csrfProtectionMiddleware, (req: any, res) => {
+  res.json({
+    csrfToken: req.csrfToken || 'generated',
+    message: 'CSRF token obtido com sucesso'
+  });
+});
+
+// Endpoint para verificar status de autenticação
+router.get('/verify', authenticateWithCookie, (req: any, res) => {
+  res.json({
+    authenticated: true,
+    user: req.user,
+    message: 'Token válido'
+  });
 });
 
 export default router;

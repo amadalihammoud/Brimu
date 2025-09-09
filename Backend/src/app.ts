@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import multer from 'multer';
 import compression from 'compression';
@@ -18,6 +19,11 @@ import paymentRoutes from './routes/paymentRoutes';
 import equipmentRoutes from './routes/equipmentRoutes';
 import calendarRoutes from './routes/calendarRoutes';
 import backupManager from './utils/backupManager';
+import securityConfig, { 
+  csrfProtectionMiddleware, 
+  secureTokenMiddleware,
+  deviceFingerprintMiddleware 
+} from './middleware/security';
 
 const app = express();
 const PORT = Number(config.server.port);
@@ -25,41 +31,37 @@ const PORT = Number(config.server.port);
 // Middleware de compressão - TypeScript fix
 app.use(compression() as any);
 
-// Middlewares de segurança
-app.use(helmet(config.security.helmet));
+// Cookie parser para HttpOnly cookies
+app.use(cookieParser());
 
-// Configuração do CORS
+// Middlewares de segurança avançados
+app.use(helmet(config.security.helmet));
+app.use(securityConfig.helmet);
+
+// Device fingerprinting para detectar atividades suspeitas
+app.use(deviceFingerprintMiddleware);
+
+// Middleware para tokens seguros e CSRF protection
+app.use(secureTokenMiddleware);
+app.use(csrfProtectionMiddleware);
+
+// Configuração do CORS com headers de segurança
 app.use(cors({
   origin: config.server.corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token']
 }));
 
-// Rate limiting geral
-const limiter = rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.maxRequests,
-  message: {
-    error: 'Muitas requisições deste IP, tente novamente mais tarde.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Aplicar rate limiting de segurança
+app.use('/api/', securityConfig.rateLimits.general);
+app.use('/api/auth/login', securityConfig.rateLimits.login);
+app.use('/api/upload', securityConfig.rateLimits.upload);
 
-// Rate limiting específico para login (mais restritivo)
-const loginLimiter = rateLimit({
-  windowMs: config.rateLimit.loginWindowMs,
-  max: config.rateLimit.loginMaxAttempts,
-  message: {
-    error: 'Muitas tentativas de login. Tente novamente em 15 minutos.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use('/api/', limiter);
-app.use('/api/auth/login', loginLimiter);
+// Detectar ataques e validar origens
+app.use(securityConfig.detectAttacks);
+app.use(securityConfig.validateOrigin);
+app.use(securityConfig.validateUserAgent);
 
 // Middleware para parsing de JSON
 app.use(express.json({ limit: config.upload.maxFileSize }));
