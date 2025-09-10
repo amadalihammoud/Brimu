@@ -1,11 +1,12 @@
 import express, { Request, Response } from 'express';
 import { Service } from '../models';
 import { parseStringParam, parseBooleanParam, parseNumberParam, QueryParams } from '../utils/queryHelpers';
+import { serviceCache, invalidateServiceCache } from '../middleware/cache';
 
 const router = express.Router();
 
 // GET /api/services - Listar todos os serviços
-router.get('/', async (req, res) => {
+router.get('/', serviceCache, async (req, res) => {
   try {
     const query = req.query as QueryParams;
     const category = parseStringParam(query.category);
@@ -37,7 +38,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/services/:id - Buscar serviço por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', serviceCache, async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
     
@@ -78,6 +79,9 @@ router.post('/', async (req, res) => {
     const service = new Service(serviceData);
     await service.save();
     
+    // Invalidar cache ao criar novo serviço
+    await invalidateServiceCache();
+    
     res.status(201).json({
       success: true,
       message: 'Serviço criado com sucesso',
@@ -114,6 +118,9 @@ router.put('/:id', async (req, res) => {
     });
     
     await service.save();
+    
+    // Invalidar cache ao atualizar serviço
+    await invalidateServiceCache(req.params.id);
     
     res.json({
       success: true,
@@ -155,6 +162,9 @@ router.delete('/:id', async (req, res) => {
     
     await Service.findByIdAndDelete(req.params.id);
     
+    // Invalidar cache ao deletar serviço
+    await invalidateServiceCache(req.params.id);
+    
     res.json({
       success: true,
       message: 'Serviço deletado com sucesso'
@@ -170,7 +180,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // GET /api/services/category/:category - Buscar serviços por categoria
-router.get('/category/:category', async (req, res) => {
+router.get('/category/:category', serviceCache, async (req, res) => {
   try {
     const services = await (Service as any).findByCategory(req.params.category);
     
@@ -190,7 +200,7 @@ router.get('/category/:category', async (req, res) => {
 });
 
 // GET /api/services/popular - Buscar serviços populares
-router.get('/popular', async (req, res) => {
+router.get('/popular', serviceCache, async (req, res) => {
   try {
     const limit = parseNumberParam(req.query.limit) || 10;
     const services = await (Service as any).findPopular(limit);
@@ -211,7 +221,7 @@ router.get('/popular', async (req, res) => {
 });
 
 // GET /api/services/stats - Estatísticas dos serviços
-router.get('/stats', async (req, res) => {
+router.get('/stats', serviceCache, async (req, res) => {
   try {
     const stats = await (Service as any).getStats();
     

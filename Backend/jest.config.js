@@ -1,31 +1,98 @@
 module.exports = {
-  preset: 'ts-jest',
+  // Ambiente de execução dos testes
   testEnvironment: 'node',
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
+
+  // Roots dos testes
+  roots: ['<rootDir>/src'],
+
+  // Padrões de arquivos de teste
   testMatch: [
-    '**/__tests__/**/*.(ts|js)',
-    '**/*.(test|spec).(ts|js)'
+    '**/__tests__/**/*.test.ts',
+    '**/?(*.)+(spec|test).ts'
   ],
+
+  // Transformações para TypeScript
   transform: {
-    '^.+\\.(ts)$': 'ts-jest'
+    '^.+\\.ts$': 'ts-jest'
   },
-  collectCoverageFrom: [
-    'src/**/*.(ts|js)',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.(ts|js)',
-    '!src/**/*.spec.(ts|js)',
-    '!src/types/**/*'
-  ],
+
+  // Extensões de arquivo reconhecidas
+  moduleFileExtensions: ['ts', 'js', 'json'],
+
+  // Setup de testes
+  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
+
+  // Coleta de cobertura
+  collectCoverage: true,
+  
+  // Diretório de cobertura
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 10000,
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+
+  // Formatos de relatório de cobertura
+  coverageReporters: [
+    'text',
+    'lcov',
+    'html',
+    'json-summary'
+  ],
+
+  // Arquivos/diretórios para coleta de cobertura
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/__tests__/**',
+    '!src/**/*.test.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/index.ts',
+    '!src/app.ts', // App principal (testado via integração)
+    '!src/types/**'
+  ],
+
+  // Thresholds de cobertura
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
   },
-  transform: {
-    '^.+\\.(ts)$': ['ts-jest', {
-      useESM: false
-    }]
-  }
+
+  // Timeout para testes
+  testTimeout: 10000, // 10 segundos
+
+  // Configurações específicas do ts-jest
+  preset: 'ts-jest',
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json'
+    }
+  },
+
+  // Ignorar arquivos/diretórios
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+    '<rootDir>/coverage/'
+  ],
+
+  // Clear mocks automaticamente
+  clearMocks: true,
+  
+  // Restore mocks automaticamente
+  restoreMocks: true,
+
+  // Verbose output
+  verbose: true,
+
+  // Executar testes em paralelo
+  maxWorkers: '50%',
+
+  // Cache do Jest
+  cache: true,
+
+  // Detectar arquivos abertos
+  detectOpenHandles: true,
+  
+  // Força saída após testes
+  forceExit: true
 };

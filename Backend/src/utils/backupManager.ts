@@ -89,8 +89,8 @@ class BackupManager {
       // Backup dos arquivos públicos
       await this.backupDirectory(this.publicDir, path.join(backupPath, 'public'));
 
-      // Backup do storage compartilhado
-      await this.backupDirectory(this.storageDir, path.join(backupPath, 'storage'));
+      // Backup apenas dos dados importantes do storage (excluindo backups)
+      await this.backupStorageDirectory(this.storageDir, path.join(backupPath, 'storage'));
 
       // Criar arquivo de metadados do backup
       await this.createBackupMetadata(backupPath, type);
@@ -118,6 +118,39 @@ class BackupManager {
       const items = await fs.readdir(sourceDir);
       
       for (const item of items) {
+        const sourcePath = path.join(sourceDir, item);
+        const targetPath = path.join(targetDir, item);
+        
+        const stats = await fs.stat(sourcePath);
+        
+        if (stats.isDirectory()) {
+          await this.backupDirectory(sourcePath, targetPath);
+        } else {
+          await fs.copyFile(sourcePath, targetPath);
+        }
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+
+  // Backup do diretório storage excluindo backups para evitar recursão
+  async backupStorageDirectory(sourceDir, targetDir) {
+    try {
+      await fs.access(sourceDir);
+      await fs.mkdir(targetDir, { recursive: true });
+
+      const items = await fs.readdir(sourceDir);
+      
+      for (const item of items) {
+        // CRÍTICO: Pular pasta de backups para evitar recursão infinita
+        if (item === 'backups') {
+          console.log('⚠️ Pulando pasta backups para evitar recursão');
+          continue;
+        }
+
         const sourcePath = path.join(sourceDir, item);
         const targetPath = path.join(targetDir, item);
         

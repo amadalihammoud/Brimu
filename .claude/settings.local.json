@@ -35,7 +35,14 @@
       "Bash(mv:*)",
       "Bash(npx tsc:*)",
       "Bash(npx create-next-app:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(rm:*)",
+      "Bash(npm test:*)",
+      "Bash(set NODE_ENV=test)",
+      "Bash(npx jest:*)",
+      "Bash(npm update:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm audit:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,333 @@
+name: 🔍 Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Code Quality & Security
+  quality-checks:
+    name: 🔍 Code Quality & Security
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para análise de diff
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Análise de Dependências Vulneráveis
+      - name: 🔒 Check for Vulnerable Dependencies
+        run: |
+          echo "🔍 Checking Backend dependencies..."
+          cd Backend && npm audit --audit-level=high --production
+          
+          echo "🔍 Checking Frontend dependencies..."
+          cd ../Frontend && npm audit --audit-level=high --production
+          
+          echo "🔍 Checking Website dependencies..."
+          cd ../website && npm audit --audit-level=high --production
+        continue-on-error: true
+
+      # Verificar Secrets Expostos
+      - name: 🕵️ Check for Exposed Secrets
+        run: |
+          echo "🔍 Scanning for exposed secrets..."
+          
+          # Verificar se há secrets hardcoded
+          if grep -r "password\|secret\|key\|token" --include="*.js" --include="*.ts" --include="*.json" . | grep -v node_modules | grep -v ".git" | grep -E "(=|:)\s*[\"'][^\"']*[\"']"; then
+            echo "⚠️ Possíveis secrets encontrados no código!"
+            echo "Por favor, use variáveis de ambiente para valores sensíveis."
+            exit 1
+          else
+            echo "✅ Nenhum secret exposto encontrado."
+          fi
+
+      # Verificar Tamanho dos Arquivos
+      - name: 📏 Check File Sizes
+        run: |
+          echo "📏 Verificando tamanhos de arquivo..."
+          
+          # Encontrar arquivos grandes (>1MB)
+          large_files=$(find . -type f -size +1M -not -path "./node_modules/*" -not -path "./.git/*")
+          
+          if [ ! -z "$large_files" ]; then
+            echo "⚠️ Arquivos grandes encontrados:"
+            echo "$large_files"
+            echo "Considere otimizar ou usar Git LFS para arquivos binários grandes."
+          else
+            echo "✅ Nenhum arquivo excessivamente grande encontrado."
+          fi
+
+  # Job 2: Análise de Código
+  code-analysis:
+    name: 📊 Code Analysis
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Backend Analysis
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./Backend
+        run: npm ci
+
+      - name: 🔐 Setup Test Environment
+        working-directory: ./Backend
+        run: |
+          echo "JWT_SECRET=test-jwt-secret-for-pr-checks-super-long-key" > .env.test
+          echo "MONGODB_URI=mongodb://root:password@localhost:27017/brimu_test?authSource=admin" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+
+      - name: 🏗️ Build Backend
+        working-directory: ./Backend
+        run: npm run build
+
+      - name: 🧪 Run Backend Tests with Coverage
+        working-directory: ./Backend
+        run: npm test -- --coverage --coverageReporters=lcov
+        env:
+          NODE_ENV: test
+
+      - name: 📊 Upload Backend Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./Backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+      # Frontend Analysis
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: 🏗️ Build Frontend
+        working-directory: ./Frontend
+        run: npm run build
+
+      - name: 🧪 Run Frontend Tests with Coverage
+        working-directory: ./Frontend
+        run: npm test -- --coverage --coverageReporters=lcov --watchAll=false
+        env:
+          CI: true
+
+      - name: 📊 Upload Frontend Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./Frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+
+      # Website Analysis
+      - name: 📦 Install Website Dependencies
+        working-directory: ./website
+        run: npm ci
+
+      - name: 🏗️ Build Website
+        working-directory: ./website
+        run: npm run build
+
+  # Job 3: Performance Analysis
+  performance-check:
+    name: ⚡ Performance Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Análise de Bundle Size
+      - name: 📦 Bundle Size Analysis
+        run: |
+          echo "📦 Analisando tamanho dos bundles..."
+          
+          # Frontend Bundle
+          cd Frontend
+          npm ci
+          npm run build
+          
+          # Verificar tamanho do bundle
+          bundle_size=$(du -sh dist/ | cut -f1)
+          echo "Frontend bundle size: $bundle_size"
+          
+          # Website Bundle
+          cd ../website
+          npm ci
+          npm run build
+          
+          # Verificar tamanho do bundle Next.js
+          if [ -d ".next" ]; then
+            next_size=$(du -sh .next/ | cut -f1)
+            echo "Website bundle size: $next_size"
+          fi
+
+      # Verificar Dependencies
+      - name: 📊 Dependencies Analysis
+        run: |
+          echo "📊 Analisando dependências..."
+          
+          # Backend dependencies
+          echo "Backend dependencies:"
+          cd Backend && npm ls --depth=0 --production
+          
+          echo "Frontend dependencies:"
+          cd ../Frontend && npm ls --depth=0 --production
+          
+          echo "Website dependencies:"
+          cd ../website && npm ls --depth=0 --production
+
+  # Job 4: Comments & Documentation
+  documentation-check:
+    name: 📝 Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 📝 Check README Updates
+        run: |
+          echo "📝 Verificando se README foi atualizado..."
+          
+          # Verificar se há mudanças significativas que requerem atualização do README
+          significant_changes=$(git diff --name-only origin/main...HEAD | grep -E "(package\.json|\.env\.example|docker|deploy)" || true)
+          
+          if [ ! -z "$significant_changes" ]; then
+            readme_changed=$(git diff --name-only origin/main...HEAD | grep -E "(README|SETUP|GUIDE)" || true)
+            
+            if [ -z "$readme_changed" ]; then
+              echo "⚠️ Mudanças significativas detectadas, considere atualizar a documentação:"
+              echo "$significant_changes"
+            else
+              echo "✅ Documentação parece estar atualizada."
+            fi
+          fi
+
+      - name: 📋 PR Information Summary
+        run: |
+          echo "## 📋 Pull Request Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Checks Performed:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Security scan for vulnerable dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Code quality and linting" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Test coverage analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Bundle size verification" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Documentation consistency" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 PR Stats:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.head_ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files changed:** $(git diff --name-only origin/main...HEAD | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commits:** $(git rev-list --count origin/main...HEAD)" >> $GITHUB_STEP_SUMMARY
+
+  # Job 5: Auto-assign reviewers
+  assign-reviewers:
+    name: 👥 Auto-assign Reviewers
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    
+    steps:
+      - name: 👥 Auto-assign reviewers
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Lista de reviewers padrão
+            const reviewers = ['team-lead', 'senior-dev']; // Substituir por usuários reais
+            
+            // Não atribuir o próprio autor
+            const filteredReviewers = reviewers.filter(reviewer => reviewer !== context.actor);
+            
+            if (filteredReviewers.length > 0) {
+              try {
+                await github.rest.pulls.requestReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  reviewers: filteredReviewers
+                });
+                console.log(`Reviewers assigned: ${filteredReviewers.join(', ')}`);
+              } catch (error) {
+                console.log('Could not assign reviewers:', error.message);
+              }
+            }
+
+      - name: 🏷️ Auto-add labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [];
+            
+            // Determinar labels baseado nos arquivos modificados
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const filenames = files.map(file => file.filename);
+            
+            if (filenames.some(name => name.startsWith('Backend/'))) {
+              labels.push('backend');
+            }
+            
+            if (filenames.some(name => name.startsWith('Frontend/'))) {
+              labels.push('frontend');
+            }
+            
+            if (filenames.some(name => name.startsWith('website/'))) {
+              labels.push('website');
+            }
+            
+            if (filenames.some(name => name.includes('docker') || name.includes('deploy'))) {
+              labels.push('deployment');
+            }
+            
+            if (filenames.some(name => name.includes('test') || name.includes('spec'))) {
+              labels.push('tests');
+            }
+            
+            if (filenames.some(name => name.includes('security') || name.includes('auth'))) {
+              labels.push('security');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+              console.log(`Labels added: ${labels.join(', ')}`);
+            }

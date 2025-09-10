@@ -111,9 +111,18 @@ const config = {
 
   // Configurações de cache
   cache: {
-    ttl: parseInt(process.env.CACHE_TTL || '300000'), // 5 minutos
+    ttl: parseInt(process.env.CACHE_TTL || '300'), // 5 minutos
     maxSize: parseInt(process.env.CACHE_MAX_SIZE || '100'),
-    defaultTTL: parseInt(process.env.CACHE_DEFAULT_TTL || '300000') // 5 minutos
+    defaultTTL: parseInt(process.env.CACHE_DEFAULT_TTL || '300') // 5 minutos
+  },
+
+  // Configurações do Redis
+  redis: {
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB || '0')
   },
 
   // Configurações de validação

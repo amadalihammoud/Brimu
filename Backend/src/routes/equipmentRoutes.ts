@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { parseStringParam, parseNumberParam } from '../utils/queryHelpers';
 import Equipment from '../models/Equipment';
 import { auth } from '../middleware/auth';
+import { equipmentCache, invalidateEquipmentCache } from '../middleware/cache';
 
 const router = express.Router();
 
@@ -66,7 +67,7 @@ const getMaintenanceStatus = (equipment) => {
 };
 
 // GET /api/equipment - Listar equipamentos com filtros otimizados
-router.get('/', (req, res) => {
+router.get('/', equipmentCache, (req, res) => {
   try {
     const page = parseNumberParam(req.query.page) || 1;
     const limit = parseNumberParam(req.query.limit) || 20;
@@ -122,7 +123,7 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/equipment/stats/overview - Estatísticas dos equipamentos
-router.get('/stats/overview', (req, res) => {
+router.get('/stats/overview', equipmentCache, (req, res) => {
   try {
     const activeEquipments = equipmentStorage.filter(eq => eq.isActive);
     
@@ -151,7 +152,7 @@ router.get('/stats/overview', (req, res) => {
 });
 
 // GET /api/equipment/:id - Buscar equipamento por ID
-router.get('/:id', (req, res) => {
+router.get('/:id', equipmentCache, (req, res) => {
   try {
     const equipment = equipmentStorage.find(eq => eq._id === req.params.id);
 
@@ -177,7 +178,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/equipment - Criar novo equipamento
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { name, category, brand, model, serialNumber, location, status, notes } = req.body;
 
@@ -230,6 +231,9 @@ router.post('/', (req, res) => {
 
     equipmentStorage.push(equipmentData);
 
+    // Invalidar cache ao criar novo equipamento
+    await invalidateEquipmentCache();
+
     res.status(201).json({
       message: 'Equipamento criado com sucesso',
       equipment: equipmentData
@@ -245,7 +249,7 @@ router.post('/', (req, res) => {
 });
 
 // PUT /api/equipment/:id - Atualizar equipamento
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const equipmentIndex = equipmentStorage.findIndex(eq => eq._id === req.params.id);
 
@@ -265,6 +269,9 @@ router.put('/:id', (req, res) => {
     (equipment as any).updatedAt = new Date();
     equipmentStorage[equipmentIndex] = equipment;
 
+    // Invalidar cache ao atualizar equipamento
+    await invalidateEquipmentCache(req.params.id);
+
     res.json({
       message: 'Equipamento atualizado com sucesso',
       equipment
@@ -280,7 +287,7 @@ router.put('/:id', (req, res) => {
 });
 
 // DELETE /api/equipment/:id - Desativar equipamento
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const equipmentIndex = equipmentStorage.findIndex(eq => eq._id === req.params.id);
 
@@ -300,6 +307,9 @@ router.delete('/:id', (req, res) => {
     (equipment as any).isActive = false;
     (equipment as any).deactivatedAt = new Date();
     equipmentStorage[equipmentIndex] = equipment;
+
+    // Invalidar cache ao desativar equipamento
+    await invalidateEquipmentCache(req.params.id);
 
     res.json({ message: 'Equipamento desativado com sucesso' });
 

@@ -1,0 +1,125 @@
+# 🛠️ Docker Compose para Desenvolvimento
+# Configurações otimizadas para desenvolvimento local
+
+version: '3.8'
+
+services:
+  # MongoDB para desenvolvimento
+  mongodb-dev:
+    image: mongo:7.0
+    container_name: brimu-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: brimu_dev
+    volumes:
+      - mongodb_dev_data:/data/db
+      - ./scripts/mongo-init-dev.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - brimu-dev-network
+
+  # Redis para desenvolvimento
+  redis-dev:
+    image: redis:7.2-alpine
+    container_name: brimu-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - brimu-dev-network
+
+  # Backend em modo desenvolvimento
+  backend-dev:
+    build: 
+      context: ./Backend
+      dockerfile: Dockerfile.dev
+    container_name: brimu-backend-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+      - "9229:9229" # Debug port
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:password@mongodb-dev:27017/brimu_dev?authSource=admin
+      JWT_SECRET: development-jwt-secret-key
+      EMAIL_HOST: smtp.ethereal.email
+      EMAIL_USER: ethereal.user@ethereal.email
+      EMAIL_PASS: ethereal-password
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3002
+      REDIS_URL: redis://redis-dev:6379
+      LOG_LEVEL: debug
+    volumes:
+      - ./Backend/src:/app/src:ro
+      - ./Backend/scripts:/app/scripts:ro
+      - backend_dev_storage:/app/storage
+      - backend_dev_uploads:/app/uploads
+    networks:
+      - brimu-dev-network
+    depends_on:
+      - mongodb-dev
+      - redis-dev
+    command: npm run dev
+
+  # MongoDB Express (Interface web para MongoDB)
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: brimu-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-dev:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+    networks:
+      - brimu-dev-network
+    depends_on:
+      - mongodb-dev
+
+  # Redis Commander (Interface web para Redis)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: brimu-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      REDIS_HOSTS: redis-dev:redis-dev:6379
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin
+    networks:
+      - brimu-dev-network
+    depends_on:
+      - redis-dev
+
+  # Mailhog (Servidor de email para teste)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: brimu-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - brimu-dev-network
+
+# Volumes para desenvolvimento
+volumes:
+  mongodb_dev_data:
+    driver: local
+  backend_dev_storage:
+    driver: local
+  backend_dev_uploads:
+    driver: local
+
+# Rede para desenvolvimento
+networks:
+  brimu-dev-network:
+    driver: bridge

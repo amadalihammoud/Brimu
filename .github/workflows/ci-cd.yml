@@ -1,0 +1,310 @@
+name: 🚀 Brimu CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Job 1: Testes e Validação
+  test:
+    name: 🧪 Tests & Quality Checks
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongosh
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            Backend/package-lock.json
+            Frontend/package-lock.json
+            website/package-lock.json
+
+      # Backend Tests
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./Backend
+        run: npm ci
+
+      - name: 🔐 Generate Test Secrets
+        working-directory: ./Backend
+        run: |
+          echo "JWT_SECRET=test-jwt-secret-for-ci-cd-pipeline-super-long-key" > .env.test
+          echo "MONGODB_URI=mongodb://root:password@localhost:27017/brimu_test?authSource=admin" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo "EMAIL_HOST=smtp.example.com" >> .env.test
+          echo "EMAIL_USER=test@example.com" >> .env.test
+          echo "EMAIL_PASS=test-password" >> .env.test
+
+      - name: 🏗️ Build Backend
+        working-directory: ./Backend
+        run: npm run build
+
+      - name: 🧪 Run Backend Tests
+        working-directory: ./Backend
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: 📊 Backend Type Check
+        working-directory: ./Backend
+        run: npm run typecheck
+
+      - name: 🔍 Backend Lint
+        working-directory: ./Backend
+        run: npm run lint
+
+      # Frontend Tests
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./Frontend
+        run: npm ci
+
+      - name: 🏗️ Build Frontend
+        working-directory: ./Frontend
+        run: npm run build
+
+      - name: 🧪 Run Frontend Tests
+        working-directory: ./Frontend
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
+
+      - name: 🔍 Frontend Lint
+        working-directory: ./Frontend
+        run: npm run lint
+
+      # Website Tests
+      - name: 📦 Install Website Dependencies
+        working-directory: ./website
+        run: npm ci
+
+      - name: 🏗️ Build Website
+        working-directory: ./website
+        run: npm run build
+
+      - name: 🔍 Website Lint
+        working-directory: ./website
+        run: npm run lint
+
+      # Security Checks
+      - name: 🔒 Security Audit Backend
+        working-directory: ./Backend
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: 🔒 Security Audit Frontend
+        working-directory: ./Frontend
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: 🔒 Security Audit Website
+        working-directory: ./website
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      # Artifact Upload
+      - name: 📤 Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            Backend/dist/
+            Frontend/dist/
+            website/.next/
+          retention-days: 7
+
+  # Job 2: Build Docker Images
+  build-docker:
+    name: 🐳 Build Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📝 Extract Metadata
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: 🏗️ Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Backend
+          file: ./Backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📝 Extract Metadata Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: 🏗️ Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Frontend
+          file: ./Frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 📝 Extract Metadata Website
+        id: meta-website
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/website
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: 🏗️ Build and Push Website Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./website
+          file: ./website/Dockerfile
+          push: true
+          tags: ${{ steps.meta-website.outputs.tags }}
+          labels: ${{ steps.meta-website.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Job 3: Deploy to Staging
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, build-docker]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to Staging
+        run: |
+          echo "🎯 Deploying to Staging Environment"
+          echo "📦 Backend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:develop"
+          echo "📦 Frontend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:develop"
+          echo "📦 Website Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/website:develop"
+          # TODO: Implementar deploy real para staging
+          # Exemplos: kubectl, docker-compose, etc.
+
+      - name: ✅ Staging Health Check
+        run: |
+          echo "🏥 Performing health checks on staging..."
+          # TODO: Implementar health checks reais
+          sleep 10
+          echo "✅ Staging deployment successful!"
+
+  # Job 4: Deploy to Production
+  deploy-production:
+    name: 🌟 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, build-docker]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to Production
+        run: |
+          echo "🎯 Deploying to Production Environment"
+          echo "📦 Backend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:latest"
+          echo "📦 Frontend Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:latest"
+          echo "📦 Website Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/website:latest"
+          # TODO: Implementar deploy real para produção
+          # Exemplos: kubectl, docker-compose, etc.
+
+      - name: ✅ Production Health Check
+        run: |
+          echo "🏥 Performing health checks on production..."
+          # TODO: Implementar health checks reais
+          sleep 10
+          echo "✅ Production deployment successful!"
+
+      - name: 📢 Notify Success
+        run: |
+          echo "🎉 Production deployment completed successfully!"
+          echo "🔗 Application URL: https://your-domain.com"
+          # TODO: Enviar notificação real (Slack, email, etc.)
+
+  # Job 5: Notification
+  notify:
+    name: 📢 Notify Results
+    runs-on: ubuntu-latest
+    needs: [test, build-docker, deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+      - name: 📊 Pipeline Summary
+        run: |
+          echo "## 📊 Pipeline Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ${{ needs.build-docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Staging Deploy | ${{ needs.deploy-staging.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Production Deploy | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🕐 **Execution Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 **Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "📝 **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

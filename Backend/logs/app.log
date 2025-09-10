@@ -1,0 +1,6 @@
+[2025-09-10T09:12:28.111Z] INFO: Notification template created {"id":"order-created","name":"Nova Ordem Criada","category":"order"}
+[2025-09-10T09:12:28.135Z] INFO: Notification template created {"id":"payment-received","name":"Pagamento Recebido","category":"payment"}
+[2025-09-10T09:12:28.140Z] INFO: Notification template created {"id":"system-alert","name":"Alerta do Sistema","category":"system"}
+[2025-09-10T09:13:49.872Z] INFO: Notification template created {"id":"order-created","name":"Nova Ordem Criada","category":"order"}
+[2025-09-10T09:13:49.904Z] INFO: Notification template created {"id":"payment-received","name":"Pagamento Recebido","category":"payment"}
+[2025-09-10T09:13:49.910Z] INFO: Notification template created {"id":"system-alert","name":"Alerta do Sistema","category":"system"}

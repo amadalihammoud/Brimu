@@ -1,0 +1,30 @@
+# 🛠️ Dockerfile de Desenvolvimento para Backend
+FROM node:18-alpine
+
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git \
+    curl
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Instalar todas as dependências (incluindo dev)
+RUN npm install
+
+# Copiar código fonte
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+
+# Expor portas
+EXPOSE 5000 9229
+
+# Comando de desenvolvimento com nodemon e debug
+CMD ["npm", "run", "dev"]

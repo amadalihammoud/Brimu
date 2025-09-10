@@ -18,12 +18,31 @@ import quoteRoutes from './routes/quoteRoutes';
 import paymentRoutes from './routes/paymentRoutes';
 import equipmentRoutes from './routes/equipmentRoutes';
 import calendarRoutes from './routes/calendarRoutes';
+import reportRoutes from './routes/reportRoutes';
 import backupManager from './utils/backupManager';
 import securityConfig, { 
   csrfProtectionMiddleware, 
   secureTokenMiddleware,
   deviceFingerprintMiddleware 
 } from './middleware/security';
+import securityAudit from './middleware/securityAudit';
+import monitoring from './middleware/realTimeMonitoring';
+import securityAdminRoutes from './routes/securityAdmin';
+import metricsRoutes from './routes/metricsRoutes';
+import notificationRoutes from './routes/notificationRoutes';
+import intelligentBackupRoutes from './routes/intelligentBackupRoutes';
+import logsRoutes from './routes/logsRoutes';
+import performanceRoutes from './routes/performanceRoutes';
+import cache from './cache/redisClient';
+import advancedLoggingService from './services/advancedLoggingService';
+import { comprehensivePerformanceMiddleware } from './middleware/performanceMiddleware';
+import { 
+  metricsCollectionMiddleware, 
+  healthCheckMetrics, 
+  cacheMetricsMiddleware,
+  errorMetricsMiddleware,
+  performanceAnalysisMiddleware 
+} from './middleware/metricsMiddleware';
 
 const app = express();
 const PORT = Number(config.server.port);
@@ -40,6 +59,23 @@ app.use(securityConfig.helmet);
 
 // Device fingerprinting para detectar atividades suspeitas
 app.use(deviceFingerprintMiddleware);
+
+// Sistema de coleta de métricas
+app.use(metricsCollectionMiddleware);
+app.use(cacheMetricsMiddleware);
+app.use(performanceAnalysisMiddleware);
+
+// Sistema de análise de performance em tempo real
+app.use(comprehensivePerformanceMiddleware);
+
+// Sistema de monitoramento em tempo real
+app.use(monitoring.trackRequest);
+
+// Sistema de auditoria de segurança
+app.use(securityAudit.checkBlockedIPs);
+app.use(securityAudit.detectScanning);
+app.use(securityAudit.detectMaliciousPayloads);
+app.use(securityAudit.detectBruteForce());
 
 // Middleware para tokens seguros e CSRF protection
 app.use(secureTokenMiddleware);
@@ -84,6 +120,24 @@ app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/backup', backupRoutes);
 
+// Rotas de administração de segurança
+app.use('/api/admin/security', securityAdminRoutes);
+
+// Rotas de métricas e monitoramento
+app.use('/api/metrics', metricsRoutes);
+
+// Rotas de notificações
+app.use('/api/notifications', notificationRoutes);
+
+// Rotas de backup inteligente
+app.use('/api/backups/intelligent', intelligentBackupRoutes);
+
+// Rotas de logs avançados
+app.use('/api/logs', logsRoutes);
+
+// Rotas de análise de performance
+app.use('/api/performance', performanceRoutes);
+
 // Rotas dos modelos de negócio
 app.use('/api/services', serviceRoutes);
 app.use('/api/orders', orderRoutes);
@@ -91,10 +145,12 @@ app.use('/api/quotes', quoteRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Rota de health check
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/api/health', healthCheckMetrics, (req: Request, res: Response) => {
   const dbStats = getConnectionStats();
+  const systemMetrics = res.locals.systemMetrics;
   
   res.json({ 
     status: 'OK',
@@ -105,10 +161,18 @@ app.get('/api/health', (req: Request, res: Response) => {
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     database: dbStats,
+    metrics: systemMetrics ? {
+      avgResponseTime: systemMetrics.avgResponseTime,
+      requestsPerMinute: systemMetrics.requestsPerMinute,
+      cacheHitRate: systemMetrics.cacheHitRate,
+      errorRate: systemMetrics.errorRate
+    } : undefined,
     availableRoutes: [
       '/api/auth - Autenticação',
       '/api/upload - Upload de arquivos',
       '/api/backup - Backup do sistema',
+      '/api/logs - Sistema de logs avançado',
+      '/api/performance - Análise de performance',
       '/api/services - CRUD de serviços',
       '/api/orders - CRUD de ordens',
       '/api/quotes - CRUD de orçamentos',
@@ -138,9 +202,18 @@ app.get('/api/status', (req: Request, res: Response) => {
   });
 });
 
-// Middleware de tratamento de erros
+// Middleware de tratamento de erros com métricas
+app.use(errorMetricsMiddleware);
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
+  advancedLoggingService.error('Application Error', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    userAgent: req.get('User-Agent'),
+    ip: req.ip,
+    requestId: req.requestId
+  });
   
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
@@ -170,19 +243,45 @@ app.use('*', (req: Request, res: Response) => {
 // Conectar ao MongoDB e iniciar servidor
 const startServer = async (): Promise<void> => {
   try {
-    console.log('🚀 Iniciando servidor Brimu...');
-    console.log(`📁 Ambiente: ${config.server.environment}`);
+    advancedLoggingService.info('Server Starting', { 
+      environment: config.server.environment,
+      port: PORT,
+      process: process.pid 
+    });
     
     // Conectar ao banco de dados
     const dbConnected = await connectDB();
     
+    // Conectar ao cache Redis
+    try {
+      await cache.connect();
+      advancedLoggingService.info('Redis Cache Connected');
+    } catch (error) {
+      advancedLoggingService.warn('Redis Cache Unavailable - Using Memory Fallback', { error: error.message });
+    }
+    
     // Iniciar servidor
     const server = app.listen(PORT, '0.0.0.0', () => {
+      advancedLoggingService.info('Server Started Successfully', {
+        port: PORT,
+        host: '0.0.0.0',
+        environment: config.server.environment,
+        database: dbConnected ? 'connected' : 'test-mode',
+        endpoints: {
+          health: `/api/health`,
+          status: `/api/status`,
+          logs: `/api/logs`,
+          uploads: `/uploads`,
+          public: `/public`
+        }
+      });
+      
       console.log('='.repeat(50));
       console.log(`🚀 Servidor Brimu rodando!`);
       console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
       console.log(`📊 Health: http://0.0.0.0:${PORT}/api/health`);
       console.log(`📈 Status: http://0.0.0.0:${PORT}/api/status`);
+      console.log(`📝 Logs: http://0.0.0.0:${PORT}/api/logs/dashboard`);
       console.log(`📤 Uploads: http://0.0.0.0:${PORT}/uploads`);
       console.log(`🌐 Público: http://0.0.0.0:${PORT}/public`);
       console.log(`🗄️ Database: ${dbConnected ? 'Conectado' : 'Modo Teste'}`);
@@ -194,23 +293,30 @@ const startServer = async (): Promise<void> => {
     
     // Graceful shutdown
     process.on('SIGTERM', () => {
-      console.log('🛑 SIGTERM recebido. Fechando servidor...');
-      server.close(() => {
-        console.log('✅ Servidor fechado');
+      advancedLoggingService.info('SIGTERM Received - Shutting Down Server');
+      server.close(async () => {
+        await cache.disconnect();
+        advancedLoggingService.info('Server Shutdown Complete');
         process.exit(0);
       });
     });
 
     process.on('SIGINT', () => {
-      console.log('🛑 SIGINT recebido. Fechando servidor...');
-      server.close(() => {
-        console.log('✅ Servidor fechado');
+      advancedLoggingService.info('SIGINT Received - Shutting Down Server');
+      server.close(async () => {
+        await cache.disconnect();
+        advancedLoggingService.info('Server Shutdown Complete');
         process.exit(0);
       });
     });
 
   } catch (error) {
-    console.error('❌ Erro ao iniciar servidor:', error);
+    advancedLoggingService.error('Failed to Start Server', {
+      error: error.message,
+      stack: error.stack,
+      environment: config.server.environment,
+      port: PORT
+    });
     process.exit(1);
   }
 };
