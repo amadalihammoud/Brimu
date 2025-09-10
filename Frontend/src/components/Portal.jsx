@@ -81,7 +81,7 @@ const Portal = ({ onBack, onLogin }) => {
             role: 'employee'
           };
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${endpoint}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

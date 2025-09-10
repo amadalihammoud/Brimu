@@ -1,7 +1,7 @@
 // Configurações de upload para o frontend
 export const UPLOAD_CONFIG = {
   // URLs da API
-  API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  API_BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   
   // Endpoints
   ENDPOINTS: {

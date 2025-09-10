@@ -24,7 +24,7 @@ const BackupManager = () => {
       if (selectedType) params.append('type', selectedType);
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/list?${params}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/list?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -50,7 +50,7 @@ const BackupManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/stats`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/stats`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -72,7 +72,7 @@ const BackupManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/create`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/create`,
         {
           method: 'POST',
           headers: {
@@ -107,7 +107,7 @@ const BackupManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/restore/${backupName}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/restore/${backupName}`,
         {
           method: 'POST',
           headers: {
@@ -136,7 +136,7 @@ const BackupManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/download/${backupName}?type=${type}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/download/${backupName}?type=${type}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -172,7 +172,7 @@ const BackupManager = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/backup/cleanup`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/backup/cleanup`,
         {
           method: 'POST',
           headers: {

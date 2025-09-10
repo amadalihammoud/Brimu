@@ -44,7 +44,7 @@ const FileManager = ({ onFileSelect, onFileEdit, onFileDelete }) => {
       });
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/upload/search?${params}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/search?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -71,7 +71,7 @@ const FileManager = ({ onFileSelect, onFileEdit, onFileDelete }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/upload/download/${fileId}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/download/${fileId}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -103,7 +103,7 @@ const FileManager = ({ onFileSelect, onFileEdit, onFileDelete }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/upload/file/${fileId}`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/file/${fileId}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -134,7 +134,7 @@ const FileManager = ({ onFileSelect, onFileEdit, onFileDelete }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/upload/file/${filename}?type=images`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/upload/file/${filename}?type=images`,
         {
           method: 'DELETE',
           headers: {

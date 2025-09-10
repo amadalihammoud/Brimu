@@ -210,7 +210,8 @@ const Clientes = ({ theme }) => {
 
         // Criar usuário no backend
         // Criando usuário no backend
-        const response = await fetch('http://localhost:5000/api/auth/register', {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${API_URL}/api/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
