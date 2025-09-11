@@ -193,10 +193,11 @@ class SecurityAuditSystem {
         action: 'blocked'
       });
 
-      return res.status(403).json({
+      res.status(403).json({
         error: 'Acesso negado',
         code: 'IP_BLOCKED'
       });
+      return;
     }
 
     next();
@@ -282,10 +283,11 @@ class SecurityAuditSystem {
           action: 'rate_limited'
         });
         
-        return res.status(429).json({
+        res.status(429).json({
           error: 'Muitas tentativas. Tente novamente mais tarde.',
           code: 'BRUTE_FORCE_DETECTED'
         });
+        return;
       }
       
       next();
@@ -360,10 +362,11 @@ class SecurityAuditSystem {
         action: 'blocked'
       });
       
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Payload malicioso detectado',
         code: 'MALICIOUS_PAYLOAD'
       });
+      return;
     }
 
     // Verificar body
@@ -380,10 +383,11 @@ class SecurityAuditSystem {
         action: 'blocked'
       });
       
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Payload malicioso detectado',
         code: 'MALICIOUS_PAYLOAD'
       });
+      return;
     }
 
     next();

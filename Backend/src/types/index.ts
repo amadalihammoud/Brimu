@@ -71,5 +71,17 @@ export interface LogContext {
   url?: string | undefined;
   statusCode?: number | undefined;
   duration?: number | undefined;
+  error?: string | undefined;
+  environment?: string | undefined;
+  port?: number | undefined;
+  endpoint?: string | undefined;
+  query?: string | undefined;
+  cacheKey?: string | undefined;
+  checksCount?: number | undefined;
+  checkName?: string | undefined;
+  score?: number | undefined;
+  metric?: string | undefined;
+  anomalyId?: string | undefined;
+  responseTime?: number | undefined;
   [key: string]: any;
 }

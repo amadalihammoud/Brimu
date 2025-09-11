@@ -759,12 +759,14 @@ class HealthCheckService extends EventEmitter {
 
     // Enviar notificação para falhas críticas
     notificationService.sendNotification({
-      type: 'alert',
+      type: 'error',
+      category: 'system',
       priority: 'high',
       title: `Critical System Health Issue: ${result.name}`,
       message: result.message,
-      channels: ['email'],
-      metadata: { healthCheck: result }
+      channels: [{ type: 'email', enabled: true }],
+      persistent: true,
+      data: { healthCheck: result }
     });
 
     this.emit('criticalFailure', result);

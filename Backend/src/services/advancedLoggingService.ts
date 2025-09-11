@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 import { logger as baseLogger } from '../utils/logger';
 import notificationService from './notificationService';
 import { defaultLogPatterns, logRetentionConfig } from '../config/logsPatterns';
+import { LogContext } from '../types';
 
 /**
  * Serviço de Logs Estruturados Avançado
@@ -25,21 +26,6 @@ export interface LogEntry {
   version: string;
 }
 
-export interface LogContext {
-  userId?: string;
-  sessionId?: string;
-  requestId?: string;
-  correlationId?: string;
-  userAgent?: string;
-  ip?: string;
-  method?: string;
-  url?: string;
-  statusCode?: number;
-  duration?: number;
-  module?: string;
-  function?: string;
-  component?: string;
-}
 
 export interface LogPattern {
   id: string;

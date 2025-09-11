@@ -261,7 +261,7 @@ export const cachePerformanceMiddleware = (cacheHit: boolean, cacheKey?: string)
           cacheKey,
           userId: req.user?.id,
           requestId: req.requestId
-        }
+        } as any
       });
 
       if (!cacheHit) {

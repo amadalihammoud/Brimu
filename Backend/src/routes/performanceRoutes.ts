@@ -438,7 +438,7 @@ router.get('/health', (req, res) => {
     
     const health = {
       status: analytics.summary.overallHealth,
-      score: this.calculateHealthScore(analytics.summary),
+      score: calculateHealthScore(analytics.summary),
       issues: anomalies.filter(a => a.severity === 'critical'),
       warnings: anomalies.filter(a => a.severity === 'warning'),
       uptime: process.uptime(),

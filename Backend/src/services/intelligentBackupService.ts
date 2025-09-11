@@ -66,7 +66,7 @@ export interface BackupMetadata {
     size: number;
   };
   duration: number;
-  status: 'created' | 'compressed' | 'verified' | 'failed';
+  status: 'created' | 'compressed' | 'verified' | 'completed' | 'failed';
   error?: string;
   location: {
     local?: string;
@@ -238,7 +238,9 @@ class IntelligentBackupService extends EventEmitter {
       await this.notifyBackupCompletion(metadata, true);
       
       // Executar limpeza de backups antigos
-      await this.intelligentCleanup(type);
+      if (type !== 'manual') {
+        await this.intelligentCleanup(type);
+      }
 
       this.emit('backupCompleted', metadata);
       

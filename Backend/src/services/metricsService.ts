@@ -124,9 +124,20 @@ class MetricsService extends EventEmitter {
     };
 
     // Verificar alertas baseados nas métricas atuais
-    const metricsForAlert = {
-      ...systemMetrics,
-      'memory.heapUsedPercent': (memory.heapUsed / memory.heapTotal) * 100
+    const metricsForAlert: Record<string, number> = {
+      timestamp: systemMetrics.timestamp,
+      uptime: systemMetrics.uptime,
+      'memory.heapUsed': systemMetrics.memory.heapUsed,
+      'memory.heapTotal': systemMetrics.memory.heapTotal,
+      'memory.external': systemMetrics.memory.external,
+      'memory.heapUsedPercent': (memory.heapUsed / memory.heapTotal) * 100,
+      'cpu.user': systemMetrics.cpu.user,
+      'cpu.system': systemMetrics.cpu.system,
+      activeConnections: systemMetrics.activeConnections,
+      cacheHitRate: systemMetrics.cacheHitRate,
+      avgResponseTime: systemMetrics.avgResponseTime,
+      errorRate: systemMetrics.errorRate,
+      requestsPerMinute: systemMetrics.requestsPerMinute
     };
     
     metricsAlertsManager.checkMetrics(metricsForAlert);
@@ -194,9 +205,9 @@ class MetricsService extends EventEmitter {
       .filter((_, index) => index % Math.max(1, Math.floor(periodMetrics.length / 20)) === 0)
       .map(m => ({
         timestamp: m.timestamp,
-        heapUsed: m.memoryUsage.heapUsed,
-        heapTotal: m.memoryUsage.heapTotal,
-        external: m.memoryUsage.external
+        heapUsed: (m.memoryUsage as NodeJS.MemoryUsage).heapUsed,
+        heapTotal: (m.memoryUsage as NodeJS.MemoryUsage).heapTotal,
+        external: (m.memoryUsage as NodeJS.MemoryUsage).external
       }));
 
     return {

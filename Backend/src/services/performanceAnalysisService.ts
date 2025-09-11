@@ -485,12 +485,14 @@ class PerformanceAnalysisService extends EventEmitter {
     // Enviar notificação para anomalias críticas
     if (anomaly.severity === 'critical') {
       notificationService.sendNotification({
-        type: 'alert',
+        type: 'error',
+        category: 'system',
         priority: 'high',
         title: 'Performance Anomaly Detected',
         message: `Critical performance issue detected: ${anomaly.metric} = ${anomaly.currentValue} (expected: ${anomaly.expectedValue})`,
-        channels: ['email'],
-        metadata: { anomaly }
+        channels: [{ type: 'email', enabled: true }],
+        persistent: true,
+        data: { anomaly }
       });
     }
 
