@@ -1,0 +1,16 @@
+[2025-09-11T01:13:31.515Z] INFO: Alert rule added {"ruleId":"memory-usage-high","name":"Uso de Memória Alto","metric":"memory.heapUsedPercent","threshold":80,"severity":"high"}
+[2025-09-11T01:13:31.518Z] INFO: Alert rule added {"ruleId":"response-time-slow","name":"Tempo de Resposta Lento","metric":"avgResponseTime","threshold":2000,"severity":"medium"}
+[2025-09-11T01:13:31.521Z] INFO: Alert rule added {"ruleId":"error-rate-high","name":"Taxa de Erro Alta","metric":"errorRate","threshold":10,"severity":"critical"}
+[2025-09-11T01:13:31.524Z] INFO: Alert rule added {"ruleId":"cache-hit-rate-low","name":"Taxa de Acerto do Cache Baixa","metric":"cacheHitRate","threshold":50,"severity":"low"}
+[2025-09-11T01:13:31.530Z] INFO: Notification template created {"id":"order-created","name":"Nova Ordem Criada","category":"order"}
+[2025-09-11T01:13:31.534Z] INFO: Notification template created {"id":"payment-received","name":"Pagamento Recebido","category":"payment"}
+[2025-09-11T01:13:31.537Z] INFO: Notification template created {"id":"system-alert","name":"Alerta do Sistema","category":"system"}
+[2025-09-11T01:14:53.095Z] INFO: Alert rule added {"ruleId":"memory-usage-high","name":"Uso de Memória Alto","metric":"memory.heapUsedPercent","threshold":80,"severity":"high"}
+[2025-09-11T01:14:53.098Z] INFO: Alert rule added {"ruleId":"response-time-slow","name":"Tempo de Resposta Lento","metric":"avgResponseTime","threshold":2000,"severity":"medium"}
+[2025-09-11T01:14:53.102Z] INFO: Alert rule added {"ruleId":"error-rate-high","name":"Taxa de Erro Alta","metric":"errorRate","threshold":10,"severity":"critical"}
+[2025-09-11T01:14:53.106Z] INFO: Alert rule added {"ruleId":"cache-hit-rate-low","name":"Taxa de Acerto do Cache Baixa","metric":"cacheHitRate","threshold":50,"severity":"low"}
+[2025-09-11T01:14:53.110Z] INFO: Notification template created {"id":"order-created","name":"Nova Ordem Criada","category":"order"}
+[2025-09-11T01:14:53.113Z] INFO: Notification template created {"id":"payment-received","name":"Pagamento Recebido","category":"payment"}
+[2025-09-11T01:14:53.117Z] INFO: Notification template created {"id":"system-alert","name":"Alerta do Sistema","category":"system"}
+[2025-09-11T01:14:53.167Z] INFO: No existing threat database found, starting fresh
+[2025-09-11T01:14:53.177Z] INFO: Backup service disabled in configuration

@@ -45,7 +45,7 @@ import {
 } from './middleware/metricsMiddleware';
 
 const app = express();
-const PORT = Number(config.server.port);
+const PORT = Number(process.env.PORT) || Number(config.server.port);
 
 // Middleware de compressão - TypeScript fix
 app.use(compression() as any);
@@ -157,7 +157,7 @@ app.get('/api/health', healthCheckMetrics, (req: Request, res: Response) => {
     message: 'Brimu Backend funcionando!', 
     timestamp: new Date().toISOString(),
     environment: config.server.environment,
-    version: require('../package.json').version,
+    version: '1.0.0',
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     database: dbStats,
@@ -278,12 +278,12 @@ const startServer = async (): Promise<void> => {
       
       console.log('='.repeat(50));
       console.log(`🚀 Servidor Brimu rodando!`);
-      console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
-      console.log(`📊 Health: http://0.0.0.0:${PORT}/api/health`);
-      console.log(`📈 Status: http://0.0.0.0:${PORT}/api/status`);
-      console.log(`📝 Logs: http://0.0.0.0:${PORT}/api/logs/dashboard`);
-      console.log(`📤 Uploads: http://0.0.0.0:${PORT}/uploads`);
-      console.log(`🌐 Público: http://0.0.0.0:${PORT}/public`);
+      console.log(`🔗 URL: http://localhost:${PORT}`);
+      console.log(`📊 Health: http://localhost:${PORT}/api/health`);
+      console.log(`📈 Status: http://localhost:${PORT}/api/status`);
+      console.log(`📝 Logs: http://localhost:${PORT}/api/logs/dashboard`);
+      console.log(`📤 Uploads: http://localhost:${PORT}/uploads`);
+      console.log(`🌐 Público: http://localhost:${PORT}/public`);
       console.log(`🗄️ Database: ${dbConnected ? 'Conectado' : 'Modo Teste'}`);
       console.log('='.repeat(50));
     });

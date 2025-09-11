@@ -82,7 +82,7 @@ class AdvancedLoggingService extends EventEmitter {
       tags: this.extractTags(message, context),
       environment: process.env.NODE_ENV || 'development',
       service: 'brimu-backend',
-      version: require('../../package.json').version
+      version: '1.0.0'
     };
 
     // Adicionar stack trace para erros
