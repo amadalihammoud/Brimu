@@ -2,7 +2,7 @@
 const config = {
   // Configurações da API
   api: {
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
     timeout: 30000, // 30 segundos
     retryAttempts: 3,
     retryDelay: 1000 // 1 segundo
@@ -123,7 +123,7 @@ export const isFeatureEnabled = (feature) => {
 export const getApiUrl = (endpoint = '') => {
   const baseURL = config.api.baseURL;
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  return `${baseURL}/${cleanEndpoint}`;
+  return `${baseURL}/api/${cleanEndpoint}`;
 };
 
 // Função para obter configuração de ambiente

@@ -117,10 +117,10 @@ export const useEquipment = () => {
 export const EquipmentProvider = ({ children }) => {
   const [state, dispatch] = useReducer(equipmentReducer, initialState);
   
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const apiRequest = useCallback(async (endpoint, options = {}) => {
-    const url = `${API_URL}${endpoint}`;
+    const url = `${API_URL}/api${endpoint}`;
     
     try {
       const response = await fetch(url, {

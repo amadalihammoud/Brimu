@@ -68,7 +68,7 @@
             result.innerHTML = '';
             
             try {
-                const API_URL = 'http://localhost:5000';
+                const API_URL = 'https://brimu-1.onrender.com';
                 const response = await fetch(`${API_URL}/api/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -104,7 +104,7 @@
         // Testar conectividade automaticamente
         window.addEventListener('load', async () => {
             try {
-                const API_URL = 'http://localhost:5000';
+                const API_URL = 'https://brimu-1.onrender.com';
                 const response = await fetch(`${API_URL}/api/health`);
                 if (response.ok) {
                     status.innerHTML = '<p class="success">✅ Backend conectado</p>';

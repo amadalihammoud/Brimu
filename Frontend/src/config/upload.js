@@ -1,7 +1,7 @@
 // Configurações de upload para o frontend
 export const UPLOAD_CONFIG = {
   // URLs da API
-  API_BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  API_BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
   
   // Endpoints
   ENDPOINTS: {
@@ -59,7 +59,7 @@ export const UPLOAD_CONFIG = {
 
 // Função para obter URL completa da API
 export const getApiUrl = (endpoint) => {
-  return `${UPLOAD_CONFIG.API_BASE_URL}${endpoint}`;
+  return `${UPLOAD_CONFIG.API_BASE_URL}/api${endpoint}`;
 };
 
 // Função para validar tipo de arquivo
