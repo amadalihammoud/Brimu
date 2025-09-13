@@ -4,7 +4,7 @@
 
 // Configurações do GA4
 const GA_CONFIG = {
-  measurementId: 'G-XXXXXXXXXX', // Substituir pelo ID real do GA4
+  measurementId: 'G-L3K0S1CNRW', // ID real do GA4
   trackingOptions: {
     send_page_view: true,
     cookie_flags: 'SameSite=Strict;Secure',
@@ -23,7 +23,7 @@ const GA_CONFIG = {
  */
 export const initGA = (measurementId = GA_CONFIG.measurementId) => {
   // Verificar se está em produção
-  if (process.env.NODE_ENV !== 'production' || !measurementId || measurementId === 'G-XXXXXXXXXX') {
+  if (process.env.NODE_ENV !== 'production' || !measurementId) {
     console.log('📊 GA4 não inicializado - Desenvolvimento ou ID não configurado');
     return false;
   }

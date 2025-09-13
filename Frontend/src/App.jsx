@@ -11,6 +11,7 @@ import { initPerformanceOptimizations } from './utils/performance/lazyLoad'
 import usePWA from './hooks/usePWA'
 import useAnalytics from './hooks/useAnalytics'
 import ConsentBanner from './components/ConsentBanner'
+import { initGA } from './utils/analytics'
 import config from './config'
 
 // Importar estilos de acessibilidade
@@ -121,6 +122,9 @@ const App = () => {
     const timer = setTimeout(() => {
       initWebVitals();
       initPerformanceOptimizations();
+      
+      // Inicializar Google Analytics
+      initGA();
       
       // Prefetch recursos críticos se PWA estiver ativo
       if (pwa.swRegistration) {

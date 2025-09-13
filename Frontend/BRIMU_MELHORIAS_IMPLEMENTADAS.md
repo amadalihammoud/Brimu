@@ -214,7 +214,7 @@ prefers-color-scheme → Modo escuro automático
 ### Variáveis de Ambiente
 ```bash
 # .env.production
-REACT_APP_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+REACT_APP_GA_MEASUREMENT_ID=G-L3K0S1CNRW
 REACT_APP_PWA_ENABLED=true
 REACT_APP_CONTRAST_FIXES=true
 ```
