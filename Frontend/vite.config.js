@@ -24,10 +24,11 @@ export default defineConfig({
     cors: true
   },
   build: {
-    target: 'es2015',
+    target: 'es2020',
     minify: 'esbuild',
     sourcemap: false,
     cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -87,7 +88,6 @@ export default defineConfig({
     },
     // Configurações de compressão
     assetsInlineLimit: 4096, // 4kb
-    chunkSizeWarningLimit: 500,
     reportCompressedSize: true
   },
   optimizeDeps: {
