@@ -7,7 +7,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-gradient-to-b from-forest-800 to-forest-900 text-white">
+    <footer id="footer" className="bg-gradient-to-b from-forest-800 to-forest-900 text-white">
       <div className="container-custom py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Logo e Sobre */}

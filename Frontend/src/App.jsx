@@ -3,7 +3,18 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { useAuthSimple as useAuth } from './hooks/useAuthSimple'
 import { NotificationProvider } from './components/NotificationSystem'
 import { EquipmentProvider } from './contexts/EquipmentContext'
+import ContrastManager from './components/accessibility/ContrastManager'
+import MetaTags from './components/SEO/MetaTags'
+import SchemaMarkup from './components/SEO/SchemaMarkup'
+import { initWebVitals } from './utils/performance/webVitals'
+import { initPerformanceOptimizations } from './utils/performance/lazyLoad'
+import usePWA from './hooks/usePWA'
+import useAnalytics from './hooks/useAnalytics'
+import ConsentBanner from './components/ConsentBanner'
 import config from './config'
+
+// Importar estilos de acessibilidade
+import './styles/accessibility/contrast-fixes.css'
 
 // Componentes da Landing Page (carregamento imediato)
 import Header from './components/Header'
@@ -91,6 +102,42 @@ const App = () => {
   const [theme, setTheme] = useState('light')
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light')
 
+  // PWA Hook
+  const pwa = usePWA({
+    enableAutoUpdate: true,
+    enableNotifications: true,
+    enableOfflineDetection: true
+  });
+
+  // Analytics Hook
+  const analytics = useAnalytics({
+    enableAutoPageTracking: true,
+    enableScrollTracking: true,
+    enableTimeTracking: true
+  });
+
+  // Inicialização de performance e Web Vitals
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      initWebVitals();
+      initPerformanceOptimizations();
+      
+      // Prefetch recursos críticos se PWA estiver ativo
+      if (pwa.swRegistration) {
+        pwa.prefetchCriticalResources();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [pwa.swRegistration]);
+
+  // Effect para solicitar permissão de notificação
+  useEffect(() => {
+    if (pwa.isPwaInstalled && !pwa.isOnline) {
+      console.log('📱 Modo offline - PWA funcionando');
+    }
+  }, [pwa.isPwaInstalled, pwa.isOnline]);
+
   // Função para lidar com login
   const handleLogin = async (email, password) => {
     try {
@@ -115,6 +162,25 @@ const App = () => {
     <NotificationProvider>
       <EquipmentProvider>
         <Router>
+          {/* SEO Meta Tags e Schema */}
+          <MetaTags />
+          <SchemaMarkup type="organization" />
+          <SchemaMarkup type="localBusiness" />
+          <SchemaMarkup type="website" />
+          
+          <ContrastManager 
+            enabled={true} 
+            autoFix={true} 
+            showIndicators={process.env.NODE_ENV === 'development'}
+            onIssuesDetected={(issues) => {
+              if (process.env.NODE_ENV === 'development' && issues.length > 0) {
+                console.log(`🎯 Brimu: ${issues.length} problemas de contraste detectados`);
+              }
+            }}
+          />
+
+          {/* Consent Banner para GDPR */}
+          <ConsentBanner />
           <div className="min-h-screen bg-white dark:bg-gray-900">
         <Routes>
           {/* Rota de autenticação */}

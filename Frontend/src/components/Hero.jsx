@@ -3,7 +3,7 @@ import { FaWhatsapp, FaArrowDown } from 'react-icons/fa'
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="main-content" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background com gradiente profissional */}
       <div className="absolute inset-0 hero-gradient opacity-95"></div>
       

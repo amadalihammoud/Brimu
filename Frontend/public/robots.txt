@@ -1,0 +1,41 @@
+User-agent: *
+
+# Permitir acesso às páginas principais
+Allow: /
+Allow: /#services
+Allow: /#about  
+Allow: /#contact
+
+# Bloquear áreas privadas e administrativas
+Disallow: /dashboard
+Disallow: /admin/
+Disallow: /client/
+Disallow: /auth
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /src/
+Disallow: /node_modules/
+
+# Permitir bots específicos do Google
+User-agent: Googlebot
+Allow: /
+
+# Permitir bot do Bing
+User-agent: Bingbot  
+Allow: /
+
+# Bloquear bots maliciosos conhecidos
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Localização do sitemap
+Sitemap: https://brimu-arborizacao.vercel.app/sitemap.xml
+
+# Crawl delay para evitar sobrecarga
+Crawl-delay: 1

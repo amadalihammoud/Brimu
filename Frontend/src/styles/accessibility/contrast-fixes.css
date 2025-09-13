@@ -1,0 +1,435 @@
+/**
+ * Contrast Fixes - Correções globais de contraste para paleta Brimu
+ * Garante conformidade WCAG AA em todas as combinações de cores
+ */
+
+/* ==========================================================================
+   SKIP LINKS - Navegação acessível por teclado
+   ========================================================================== */
+
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #22C55E;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   FOREST PALETTE CONTRAST FIXES
+   ========================================================================== */
+
+/* Texto escuro em fundos forest escuros - FORÇAR TEXTO CLARO */
+.bg-forest-600 *,
+.bg-forest-700 *,
+.bg-forest-800 *,
+.bg-forest-900 * {
+  color: #ffffff !important;
+}
+
+.bg-forest-600 a,
+.bg-forest-700 a,
+.bg-forest-800 a,
+.bg-forest-900 a {
+  color: #dcf2e3 !important;
+}
+
+.bg-forest-600 a:hover,
+.bg-forest-700 a:hover,
+.bg-forest-800 a:hover,
+.bg-forest-900 a:hover {
+  color: #ffffff !important;
+}
+
+/* Texto claro em fundos forest claros - FORÇAR TEXTO ESCURO */
+.bg-forest-50 *,
+.bg-forest-100 *,
+.bg-forest-200 *,
+.bg-forest-300 * {
+  color: #1a2f22 !important;
+}
+
+.bg-forest-50 a,
+.bg-forest-100 a,
+.bg-forest-200 a,
+.bg-forest-300 a {
+  color: #2d5a3d !important;
+}
+
+.bg-forest-50 a:hover,
+.bg-forest-100 a:hover,
+.bg-forest-200 a:hover,
+.bg-forest-300 a:hover {
+  color: #1f3d2a !important;
+}
+
+/* Forest 400-500: Fundos médios precisam de ajuste contextual */
+.bg-forest-400 * {
+  color: #0f1a13 !important;
+}
+
+.bg-forest-500 * {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   TEXT COLOR CLASSES - Correções diretas de classes Tailwind
+   ========================================================================== */
+
+/* Texto forest escuro em qualquer fundo claro */
+.text-forest-600,
+.text-forest-700,
+.text-forest-800,
+.text-forest-900 {
+  color: #1a2f22 !important;
+}
+
+/* Texto forest claro em qualquer fundo escuro */
+.text-forest-50,
+.text-forest-100,
+.text-forest-200,
+.text-forest-300 {
+  color: #f0f9f4 !important;
+}
+
+/* ==========================================================================
+   BUTTON CONTRAST FIXES
+   ========================================================================== */
+
+/* Botões primários com fundo forest */
+.btn-forest,
+.bg-forest-600.btn,
+.bg-forest-700.btn,
+.bg-forest-800.btn {
+  background-color: #2d5a3d !important;
+  color: #ffffff !important;
+  border-color: #1f3d2a !important;
+}
+
+.btn-forest:hover,
+.bg-forest-600.btn:hover,
+.bg-forest-700.btn:hover,
+.bg-forest-800.btn:hover {
+  background-color: #1f3d2a !important;
+  color: #ffffff !important;
+}
+
+/* Botões secundários */
+.btn-forest-outline {
+  background-color: transparent !important;
+  color: #2d5a3d !important;
+  border: 2px solid #2d5a3d !important;
+}
+
+.btn-forest-outline:hover {
+  background-color: #2d5a3d !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   CARD COMPONENTS CONTRAST
+   ========================================================================== */
+
+/* Cards com fundo escuro */
+.card-dark,
+.bg-gray-800.card,
+.bg-gray-900.card {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+.card-dark .card-title,
+.bg-gray-800.card .card-title,
+.bg-gray-900.card .card-title {
+  color: #ffffff !important;
+}
+
+.card-dark .card-text,
+.bg-gray-800.card .card-text,
+.bg-gray-900.card .card-text {
+  color: #e2e8f0 !important;
+}
+
+/* Cards com fundo claro */
+.card-light,
+.bg-white.card,
+.bg-gray-50.card {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   NAVIGATION CONTRAST
+   ========================================================================== */
+
+/* Header/Nav com fundo escuro */
+.navbar-dark,
+.bg-forest-800.navbar,
+.bg-forest-900.navbar {
+  background-color: #1a2f22 !important;
+}
+
+.navbar-dark .nav-link,
+.bg-forest-800.navbar .nav-link,
+.bg-forest-900.navbar .nav-link {
+  color: #dcf2e3 !important;
+}
+
+.navbar-dark .nav-link:hover,
+.bg-forest-800.navbar .nav-link:hover,
+.bg-forest-900.navbar .nav-link:hover {
+  color: #ffffff !important;
+}
+
+.navbar-dark .navbar-brand,
+.bg-forest-800.navbar .navbar-brand,
+.bg-forest-900.navbar .navbar-brand {
+  color: #ffffff !important;
+}
+
+/* Header/Nav com fundo claro */
+.navbar-light,
+.bg-white.navbar,
+.bg-forest-50.navbar {
+  background-color: #ffffff !important;
+}
+
+.navbar-light .nav-link,
+.bg-white.navbar .nav-link,
+.bg-forest-50.navbar .nav-link {
+  color: #2d5a3d !important;
+}
+
+.navbar-light .nav-link:hover,
+.bg-white.navbar .nav-link:hover,
+.bg-forest-50.navbar .nav-link:hover {
+  color: #1f3d2a !important;
+}
+
+/* ==========================================================================
+   FORM ELEMENTS CONTRAST
+   ========================================================================== */
+
+/* Inputs e form controls */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea,
+select {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+.form-control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #22c55e !important;
+  outline: 2px solid rgba(34, 197, 94, 0.2) !important;
+  outline-offset: 2px !important;
+}
+
+/* Labels */
+.form-label,
+label {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+/* Placeholders */
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+   ALERT/NOTIFICATION CONTRAST
+   ========================================================================== */
+
+/* Success alerts */
+.alert-success,
+.notification-success {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #22c55e !important;
+}
+
+/* Error alerts */
+.alert-error,
+.notification-error {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  border-color: #ef4444 !important;
+}
+
+/* Warning alerts */
+.alert-warning,
+.notification-warning {
+  background-color: #fefce8 !important;
+  color: #a16207 !important;
+  border-color: #eab308 !important;
+}
+
+/* Info alerts */
+.alert-info,
+.notification-info {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE SUPPORT
+   ========================================================================== */
+
+@media (prefers-contrast: high) {
+  /* Aumenta contraste para usuários que preferem */
+  .bg-forest-600 *,
+  .bg-forest-700 *,
+  .bg-forest-800 *,
+  .bg-forest-900 * {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+  }
+
+  .bg-forest-50 *,
+  .bg-forest-100 *,
+  .bg-forest-200 *,
+  .bg-forest-300 * {
+    color: #000000 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Bordas mais visíveis */
+  .btn,
+  .card,
+  .form-control {
+    border-width: 2px !important;
+  }
+
+  /* Foco mais visível */
+  *:focus {
+    outline: 3px solid #22c55e !important;
+    outline-offset: 3px !important;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE CONTRAST ADJUSTMENTS
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .auto-contrast-dark {
+    background-color: #0f1a13 !important;
+    color: #f0f9f4 !important;
+  }
+
+  .auto-contrast-dark .card {
+    background-color: #1a2f22 !important;
+    color: #dcf2e3 !important;
+    border-color: #2d5a3d !important;
+  }
+
+  .auto-contrast-dark .btn-primary {
+    background-color: #22c55e !important;
+    color: #0f1a13 !important;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES - Garante contraste adequado na impressão
+   ========================================================================== */
+
+@media print {
+  * {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+  }
+
+  .bg-forest-600,
+  .bg-forest-700,
+  .bg-forest-800,
+  .bg-forest-900 {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES para correções manuais
+   ========================================================================== */
+
+.force-light-text {
+  color: #ffffff !important;
+}
+
+.force-dark-text {
+  color: #1a2f22 !important;
+}
+
+.ensure-contrast-light {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+.ensure-contrast-dark {
+  background-color: #1a2f22 !important;
+  color: #f0f9f4 !important;
+}
+
+/* Classe para elementos que foram corrigidos automaticamente */
+[data-contrast-fixed="true"] {
+  position: relative;
+}
+
+[data-contrast-fixed="true"]::before {
+  content: "★";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #22c55e;
+  color: #ffffff;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0.7;
+}
