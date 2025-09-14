@@ -38,6 +38,7 @@ export default function ClientOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não estiver autenticado ou se for admin
