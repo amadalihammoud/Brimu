@@ -98,24 +98,23 @@ export function useAuth() {
 
       // Usar API segura para login
       const response = await secureApiClient.login(validation.data);
-      
-      const responseData = response.data as { token?: string; user?: any };
+
+      const responseData = response.data as any;
       if (responseData.token) {
         // Armazenar preferencialmente em sessionStorage (mais seguro)
         sessionStorage.setItem('authToken', responseData.token);
         sessionStorage.setItem('userEmail', validation.data.email);
-        
+
         // Fallback para localStorage para compatibilidade
         localStorage.setItem('token', responseData.token);
         localStorage.setItem('userEmail', validation.data.email);
-        
+
         // Detectar tipo de usuário baseado no email para demonstração
-        const isAdminEmail = validation.data.email.includes('admin') || 
-                            validation.data.email.includes('brimu') || 
+        const isAdminEmail = validation.data.email.includes('admin') ||
+                            validation.data.email.includes('brimu') ||
                             validation.data.email === 'admin@email.com';
-        
+
         // Salvar dados do usuário (vindos do backend ou mockados)
-        const responseData = response.data as any;
         const userData = responseData.user || {
           id: responseData.userId || '1',
           name: responseData.name || (isAdminEmail ? 'Administrador' : 'Cliente'),
