@@ -1,9 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm ci",
-  "devCommand": "npm run dev",
+  "builds": [
+    {
+      "src": "website/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "website/$1"
+    }
+  ],
+  "buildCommand": "cd website && npm run build",
+  "outputDirectory": "website/.next",
+  "installCommand": "cd website && npm ci",
+  "devCommand": "cd website && npm run dev",
   "headers": [
     {
       "source": "/assets/(.*)",

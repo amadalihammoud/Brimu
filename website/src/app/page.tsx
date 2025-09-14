@@ -8,7 +8,7 @@ import {
   Mail, 
   MapPin,
   ArrowRight 
-} from 'lucide-react';
+} from '@/components/Icons';
 
 export default function Home() {
   return (

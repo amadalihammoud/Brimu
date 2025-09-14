@@ -150,15 +150,12 @@ export const contentSecurityPolicy = {
 // Log de eventos de segurança
 export const securityLogger = {
   logAuthAttempt: (email: string, success: boolean, ip?: string) => {
-    console.log(`[SECURITY] Auth attempt: ${email}, success: ${success}, ip: ${ip || 'unknown'}`);
   },
   
   logUnauthorizedAccess: (path: string, userAgent?: string) => {
-    console.warn(`[SECURITY] Unauthorized access attempt: ${path}, user-agent: ${userAgent || 'unknown'}`);
   },
   
   logSuspiciousActivity: (activity: string, details: any) => {
-    console.warn(`[SECURITY] Suspicious activity: ${activity}`, details);
   }
 };
 

@@ -13,7 +13,7 @@ import {
   User,
   Phone,
   Wrench
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -38,7 +38,6 @@ export default function ClientOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não estiver autenticado ou se for admin
@@ -129,7 +128,7 @@ export default function ClientOrdersPage() {
       
       setOrders(mockOrders);
     } catch (error) {
-      console.error('Erro ao carregar ordens:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar ordens:', error);
     } finally {
       setDataLoading(false);
     }
@@ -172,7 +171,6 @@ export default function ClientOrdersPage() {
 
   const handleViewOrder = (order: Order) => {
     // Implementar visualização da ordem
-    console.log('Ver ordem:', order);
   };
 
   if (loading || dataLoading) {

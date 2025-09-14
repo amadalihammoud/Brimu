@@ -328,7 +328,7 @@ export const useLongPress = (
   delay = 500
 ) => {
   const [isPressed, setIsPressed] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout>();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const start = () => {
     setIsPressed(true);

@@ -18,7 +18,7 @@ import {
   User,
   TrendingUp,
   Filter
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -44,8 +44,6 @@ export default function AdminQuotesPage() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [periodFilter, setPeriodFilter] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -100,7 +98,7 @@ export default function AdminQuotesPage() {
     }
 
     setFilteredQuotes(filtered);
-  }, [quotes, searchTerm, statusFilter, periodFilter]);
+  }, [quotes, searchTerm, statusFilter, dateFilter]);
 
   const loadQuotes = async () => {
     try {
@@ -189,7 +187,7 @@ export default function AdminQuotesPage() {
       
       setQuotes(mockQuotes);
     } catch (error) {
-      console.error('Erro ao carregar orçamentos:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar orçamentos:', error);
     } finally {
       setDataLoading(false);
     }
@@ -246,19 +244,15 @@ export default function AdminQuotesPage() {
   };
 
   const handleViewQuote = (quote: Quote) => {
-    console.log('Ver orçamento:', quote);
   };
 
   const handleEditQuote = (quote: Quote) => {
-    console.log('Editar orçamento:', quote);
   };
 
   const handleDownloadQuote = (quote: Quote) => {
-    console.log('Download PDF:', quote);
   };
 
   const handleCreateQuote = () => {
-    console.log('Criar novo orçamento');
   };
 
   if (loading || dataLoading) {

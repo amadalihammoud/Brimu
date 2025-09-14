@@ -47,8 +47,7 @@ api.interceptors.request.use(
 
     // Log da requisição (sem dados sensíveis)
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, 
-                  sanitizeForLog(config.data));
+      console.log(`[API] Request: ${config.method?.toUpperCase()} ${config.url}`, sanitizeForLog(config.data));
     }
 
     return config;
@@ -69,7 +68,7 @@ api.interceptors.response.use(
     
     return response;
   },
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
     const url = error.config?.url;
     
@@ -88,7 +87,6 @@ api.interceptors.response.use(
         try {
           await api.post('/auth/logout');
         } catch (logoutError) {
-          console.warn('Error during secure logout:', logoutError);
         }
         
         // Limpar storage local
@@ -114,7 +112,7 @@ api.interceptors.response.use(
     
     // Rate limiting do servidor
     if (status === 429) {
-      console.warn('Rate limited by server');
+      securityLogger.logSuspiciousActivity('Rate Limit Hit', { url, userAgent: navigator.userAgent });
     }
     
     return Promise.reject(error);

@@ -17,10 +17,9 @@ import {
   XCircle,
   CreditCard,
   Receipt,
-  Filter,
   User,
   FileText
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -53,9 +52,6 @@ export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [methodFilter, setMethodFilter] = useState<string>('all');
-  const [periodFilter, setPeriodFilter] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -117,7 +113,7 @@ export default function AdminPaymentsPage() {
     }
 
     setFilteredPayments(filtered);
-  }, [payments, searchTerm, statusFilter, methodFilter, periodFilter]);
+  }, [payments, searchTerm, statusFilter, dateFilter]);
 
   const loadPayments = async () => {
     try {
@@ -241,7 +237,7 @@ export default function AdminPaymentsPage() {
       
       setPayments(mockPayments);
     } catch (error) {
-      console.error('Erro ao carregar pagamentos:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar pagamentos:', error);
     } finally {
       setDataLoading(false);
     }
@@ -312,19 +308,15 @@ export default function AdminPaymentsPage() {
   };
 
   const handleViewPayment = (payment: Payment) => {
-    console.log('Ver pagamento:', payment);
   };
 
   const handleEditPayment = (payment: Payment) => {
-    console.log('Editar pagamento:', payment);
   };
 
   const handleDownloadReceipt = (payment: Payment) => {
-    console.log('Download comprovante:', payment);
   };
 
   const handleCreatePayment = () => {
-    console.log('Criar novo pagamento');
   };
 
   if (loading || dataLoading) {

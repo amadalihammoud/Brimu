@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { 
   Users, 
   Search, 
-  Filter,
   Plus,
   Eye, 
   Edit,
@@ -17,7 +16,7 @@ import {
   TrendingUp,
   Star,
   Building
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -43,8 +42,8 @@ export default function AdminClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -159,7 +158,7 @@ export default function AdminClientsPage() {
       
       setClients(mockClients);
     } catch (error) {
-      console.error('Erro ao carregar clientes:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar clientes:', error);
     } finally {
       setDataLoading(false);
     }
@@ -197,15 +196,12 @@ export default function AdminClientsPage() {
   };
 
   const handleViewClient = (client: Client) => {
-    console.log('Ver cliente:', client);
   };
 
   const handleEditClient = (client: Client) => {
-    console.log('Editar cliente:', client);
   };
 
   const handleCreateClient = () => {
-    console.log('Criar novo cliente');
   };
 
   if (loading || dataLoading) {

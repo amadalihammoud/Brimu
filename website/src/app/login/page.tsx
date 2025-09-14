@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { TreePine, Eye, EyeOff } from 'lucide-react';
+import { TreePine, Eye, EyeOff } from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Login() {

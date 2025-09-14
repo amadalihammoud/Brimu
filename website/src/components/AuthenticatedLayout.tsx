@@ -16,7 +16,7 @@ import {
   LogOut,
   Calendar,
   Users
-} from 'lucide-react';
+} from '@/components/Icons';
 
 interface User {
   id: string;

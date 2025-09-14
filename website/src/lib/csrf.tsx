@@ -3,6 +3,8 @@
  * Implementa proteção contra ataques Cross-Site Request Forgery
  */
 
+import React from 'react';
+
 // Gerar token CSRF criptograficamente seguro
 export const generateCSRFToken = (): string => {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
@@ -204,19 +206,25 @@ export const csrfRateLimit = new CSRFRateLimit();
 // Logger específico para eventos CSRF
 export const csrfLogger = {
   logTokenGeneration: (userAgent?: string) => {
-    console.log('[CSRF] Token generated', { userAgent, timestamp: new Date().toISOString() });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('CSRF Token Generated:', { userAgent, timestamp: new Date().toISOString() });
+    }
   },
   
   logTokenValidation: (success: boolean, token?: string) => {
-    console.log('[CSRF] Token validation', { 
-      success, 
-      tokenLength: token?.length || 0,
-      timestamp: new Date().toISOString() 
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('CSRF Token Validation:', { 
+        success, 
+        tokenLength: token?.length || 0,
+        timestamp: new Date().toISOString() 
+      });
+    }
   },
   
   logSuspiciousActivity: (activity: string, details: any) => {
-    console.warn('[CSRF] Suspicious activity detected', { activity, details, timestamp: new Date().toISOString() });
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('CSRF Suspicious Activity:', { activity, details, timestamp: new Date().toISOString() });
+    }
   }
 };
 

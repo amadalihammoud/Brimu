@@ -84,7 +84,6 @@ export function useSecureAuth() {
           throw new Error('No user data found');
         }
       } catch (userError) {
-        console.warn('Error loading user data:', userError);
         // Limpar dados inválidos
         sessionStorage.removeItem('authToken');
         sessionStorage.removeItem('userData');
@@ -93,7 +92,6 @@ export function useSecureAuth() {
         setUser(null);
       }
     } catch (error) {
-      console.warn('Authentication check failed:', error);
       // Token inválido ou erro de conexão
       sessionStorage.removeItem('authToken');
       sessionStorage.removeItem('userData');
@@ -182,7 +180,7 @@ export function useSecureAuth() {
       
       return { success: false, error: 'Credenciais inválidas' };
     } catch (error: any) {
-      console.error('Login error:', error);
+      if (process.env.NODE_ENV === "development") console.error('Login error:', error);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Erro interno do servidor' 

@@ -42,7 +42,14 @@
       "Bash(npx jest:*)",
       "Bash(npm update:*)",
       "Bash(npm ls:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(del /s /q \"Backend\\storage_corrupted_backup\")",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(robocopy:*)",
+      "Bash(vercel:*)",
+      "Bash(xargs sed:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

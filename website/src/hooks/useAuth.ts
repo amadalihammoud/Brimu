@@ -45,7 +45,6 @@ export function useAuth() {
         if (validation.isValid) {
           setUser(userData);
         } else {
-          console.warn('Invalid user data detected:', validation.errors);
           throw new Error('Invalid user data');
         }
       } else {
@@ -100,13 +99,14 @@ export function useAuth() {
       // Usar API segura para login
       const response = await secureApiClient.login(validation.data);
       
-      if (response.data.token) {
+      const responseData = response.data as { token?: string; user?: any };
+      if (responseData.token) {
         // Armazenar preferencialmente em sessionStorage (mais seguro)
-        sessionStorage.setItem('authToken', response.data.token);
+        sessionStorage.setItem('authToken', responseData.token);
         sessionStorage.setItem('userEmail', validation.data.email);
         
         // Fallback para localStorage para compatibilidade
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', responseData.token);
         localStorage.setItem('userEmail', validation.data.email);
         
         // Detectar tipo de usuário baseado no email para demonstração

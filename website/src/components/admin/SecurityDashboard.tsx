@@ -91,7 +91,7 @@ const SecurityDashboard = () => {
       const mockData = generateMockMetrics();
       setMetrics(mockData);
     } catch (error) {
-      console.error('Erro ao carregar métricas de segurança:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar métricas de segurança:', error);
     } finally {
       setIsLoading(false);
     }

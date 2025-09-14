@@ -13,7 +13,7 @@ import {
   CheckCircle,
   Clock,
   XCircle
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -33,7 +33,6 @@ export default function ClientQuotesPage() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não estiver autenticado ou se for admin
@@ -108,7 +107,7 @@ export default function ClientQuotesPage() {
       
       setQuotes(mockQuotes);
     } catch (error) {
-      console.error('Erro ao carregar orçamentos:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar orçamentos:', error);
     } finally {
       setDataLoading(false);
     }
@@ -154,12 +153,10 @@ export default function ClientQuotesPage() {
 
   const handleViewQuote = (quote: Quote) => {
     // Implementar visualização do orçamento
-    console.log('Ver orçamento:', quote);
   };
 
   const handleDownloadQuote = (quote: Quote) => {
     // Implementar download do PDF
-    console.log('Download orçamento:', quote);
   };
 
   if (loading || dataLoading) {

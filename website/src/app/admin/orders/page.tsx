@@ -16,9 +16,8 @@ import {
   Phone,
   Wrench,
   Truck,
-  TrendingUp,
-  Filter
-} from 'lucide-react';
+  TrendingUp
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -51,9 +50,6 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [dateFilter, setDateFilter] = useState<string>('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -112,7 +108,7 @@ export default function AdminOrdersPage() {
     }
 
     setFilteredOrders(filtered);
-  }, [orders, searchTerm, statusFilter, priorityFilter, dateFilter]);
+  }, [orders, searchTerm, statusFilter, priorityFilter]);
 
   const loadOrders = async () => {
     try {
@@ -229,7 +225,7 @@ export default function AdminOrdersPage() {
       
       setOrders(mockOrders);
     } catch (error) {
-      console.error('Erro ao carregar ordens:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar ordens:', error);
     } finally {
       setDataLoading(false);
     }
@@ -306,15 +302,12 @@ export default function AdminOrdersPage() {
   };
 
   const handleViewOrder = (order: Order) => {
-    console.log('Ver ordem:', order);
   };
 
   const handleEditOrder = (order: Order) => {
-    console.log('Editar ordem:', order);
   };
 
   const handleCreateOrder = () => {
-    console.log('Criar nova ordem');
   };
 
   if (loading || dataLoading) {

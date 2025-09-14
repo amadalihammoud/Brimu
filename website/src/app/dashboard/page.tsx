@@ -11,7 +11,7 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle
-} from 'lucide-react';
+} from '@/components/Icons';
 import { useAuth } from '@/hooks/useAuth';
 import AuthenticatedLayout from '@/components/AuthenticatedLayout';
 
@@ -124,7 +124,7 @@ export default function Dashboard() {
         ]);
       }
     } catch (error) {
-      console.error('Erro ao carregar dashboard:', error);
+      if (process.env.NODE_ENV === "development") console.error('Erro ao carregar dashboard:', error);
     } finally {
       setDashboardLoading(false);
     }
