@@ -52,6 +52,7 @@ export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -110,7 +111,7 @@ export default function AdminOrdersPage() {
     }
 
     setFilteredOrders(filtered);
-  }, [orders, searchTerm, statusFilter, priorityFilter]);
+  }, [orders, searchTerm, statusFilter, priorityFilter, dateFilter]);
 
   const loadOrders = async () => {
     try {
