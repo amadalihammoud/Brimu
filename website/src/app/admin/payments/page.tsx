@@ -52,6 +52,9 @@ export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [methodFilter, setMethodFilter] = useState('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -113,7 +116,7 @@ export default function AdminPaymentsPage() {
     }
 
     setFilteredPayments(filtered);
-  }, [payments, searchTerm, statusFilter, dateFilter]);
+  }, [payments, searchTerm, statusFilter, dateFilter, methodFilter]);
 
   const loadPayments = async () => {
     try {
