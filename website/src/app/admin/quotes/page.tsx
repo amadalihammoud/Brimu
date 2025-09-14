@@ -46,6 +46,7 @@ export default function AdminQuotesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState('all');
   const [dataLoading, setDataLoading] = useState(true);
 
   // Redirecionar se não for admin autenticado
@@ -100,7 +101,7 @@ export default function AdminQuotesPage() {
     }
 
     setFilteredQuotes(filtered);
-  }, [quotes, searchTerm, statusFilter, dateFilter]);
+  }, [quotes, searchTerm, statusFilter, dateFilter, periodFilter]);
 
   const loadQuotes = async () => {
     try {
