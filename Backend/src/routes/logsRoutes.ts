@@ -83,7 +83,7 @@ router.get('/search', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -117,7 +117,7 @@ router.get('/analytics', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -137,7 +137,7 @@ router.get('/patterns', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -213,7 +213,7 @@ router.post('/patterns', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -240,7 +240,7 @@ router.delete('/patterns/:id', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -295,7 +295,7 @@ router.get('/export', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -324,7 +324,7 @@ router.post('/cleanup', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -390,7 +390,7 @@ router.get('/dashboard', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -458,7 +458,7 @@ router.get('/realtime', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

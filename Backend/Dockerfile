@@ -62,7 +62,7 @@ RUN mkdir -p storage/logs storage/temp storage/backups uploads public \
     && chown -R backend:nodejs storage uploads public
 
 # Copiar arquivos de configuração
-COPY --chown=backend:nodejs .env.example .env
+COPY --chown=backend:nodejs .env.production .env || COPY --chown=backend:nodejs .env.example .env
 
 # Definir variáveis de ambiente
 ENV NODE_ENV=production

@@ -32,7 +32,7 @@ router.get('/', serviceCache, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -58,7 +58,7 @@ router.get('/:id', serviceCache, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -92,7 +92,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -132,7 +132,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -174,7 +174,7 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -194,7 +194,7 @@ router.get('/category/:category', serviceCache, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -215,7 +215,7 @@ router.get('/popular', serviceCache, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -234,7 +234,7 @@ router.get('/stats', serviceCache, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

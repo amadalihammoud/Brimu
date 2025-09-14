@@ -40,7 +40,7 @@ router.get('/system', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -61,7 +61,7 @@ router.get('/performance', metricsCache, (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -82,7 +82,7 @@ router.get('/alerts', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -133,7 +133,7 @@ router.post('/alerts/threshold', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -154,7 +154,7 @@ router.delete('/alerts/threshold/:metric', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -204,7 +204,7 @@ router.get('/dashboard', metricsCache, (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -229,7 +229,7 @@ router.get('/export', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -272,7 +272,7 @@ router.get('/realtime', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

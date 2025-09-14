@@ -44,7 +44,7 @@ export const performanceStartMiddleware = (req: Request, res: Response, next: Ne
         capturePerformanceMetrics(req, res);
       } catch (error) {
         advancedLoggingService.error('Error capturing performance metrics', {
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           endpoint: req.path,
           method: req.method
         });
@@ -57,7 +57,7 @@ export const performanceStartMiddleware = (req: Request, res: Response, next: Ne
     next();
   } catch (error) {
     advancedLoggingService.error('Error in performance start middleware', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: req.path,
       method: req.method
     });
@@ -225,7 +225,7 @@ export const resourceUsageMiddleware = (req: Request, res: Response, next: NextF
         }
       } catch (error) {
         advancedLoggingService.error('Error in resource usage middleware', {
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           endpoint: req.path,
           method: req.method
         });
@@ -237,7 +237,7 @@ export const resourceUsageMiddleware = (req: Request, res: Response, next: NextF
     next();
   } catch (error) {
     advancedLoggingService.error('Error in resource usage middleware setup', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: req.path,
       method: req.method
     });
@@ -276,7 +276,7 @@ export const cachePerformanceMiddleware = (cacheHit: boolean, cacheKey?: string)
       next();
     } catch (error) {
       advancedLoggingService.error('Error in cache performance middleware', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         endpoint: req.path,
         method: req.method
       });
@@ -333,7 +333,7 @@ export const throughputAnalysisMiddleware = (() => {
       next();
     } catch (error) {
       advancedLoggingService.error('Error in throughput analysis middleware', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         endpoint: req.path,
         method: req.method
       });
@@ -381,7 +381,7 @@ export const createCustomPerformanceMiddleware = (
           });
         } catch (error) {
           advancedLoggingService.error(`Error in custom performance middleware (${metricName})`, {
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             endpoint: req.path,
             method: req.method
           });
@@ -393,7 +393,7 @@ export const createCustomPerformanceMiddleware = (
       next();
     } catch (error) {
       advancedLoggingService.error(`Error setting up custom performance middleware (${metricName})`, {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         endpoint: req.path,
         method: req.method
       });

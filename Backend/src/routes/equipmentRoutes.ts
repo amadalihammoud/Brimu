@@ -117,7 +117,7 @@ router.get('/', equipmentCache, (req, res) => {
     console.error('Erro ao listar equipamentos:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -146,7 +146,7 @@ router.get('/stats/overview', equipmentCache, (req, res) => {
     console.error('Erro ao buscar estatísticas:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -172,7 +172,7 @@ router.get('/:id', equipmentCache, (req, res) => {
     console.error('Erro ao buscar equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -243,7 +243,7 @@ router.post('/', async (req, res) => {
     console.error('Erro ao criar equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -281,7 +281,7 @@ router.put('/:id', async (req, res) => {
     console.error('Erro ao atualizar equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -317,7 +317,7 @@ router.delete('/:id', async (req, res) => {
     console.error('Erro ao desativar equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -349,7 +349,7 @@ router.post('/:id/assign', (req, res) => {
     console.error('Erro ao atribuir equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -379,7 +379,7 @@ router.post('/:id/release', (req, res) => {
     console.error('Erro ao liberar equipamento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -435,7 +435,7 @@ router.post('/:id/maintenance', (req, res) => {
     console.error('Erro ao registrar manutenção:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });

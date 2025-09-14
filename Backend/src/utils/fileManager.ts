@@ -29,7 +29,7 @@ class FileManager {
   }
 
   // Salvar arquivo
-  async saveFile(file, destination, filename = null, userId = null) {
+  async saveFile(file: any, destination: string, filename: string | null = null, userId: string | null = null) {
     const finalFilename = filename || this.generateUniqueFilename(file.originalname);
     const filePath = path.join(destination, finalFilename);
     
@@ -57,40 +57,40 @@ class FileManager {
   }
 
   // Deletar arquivo
-  async deleteFile(filePath) {
+  async deleteFile(filePath: string) {
     try {
       await fs.unlink(filePath);
       return true;
     } catch (error) {
-      console.error(`Erro ao deletar arquivo: ${error.message}`);
+      console.error(`Erro ao deletar arquivo: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
 
   // Mover arquivo
-  async moveFile(sourcePath, destinationPath) {
+  async moveFile(sourcePath: string, destinationPath: string) {
     try {
       await fs.rename(sourcePath, destinationPath);
       return true;
     } catch (error) {
-      console.error(`Erro ao mover arquivo: ${error.message}`);
+      console.error(`Erro ao mover arquivo: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
 
   // Copiar arquivo
-  async copyFile(sourcePath, destinationPath) {
+  async copyFile(sourcePath: string, destinationPath: string) {
     try {
       await fs.copyFile(sourcePath, destinationPath);
       return true;
     } catch (error) {
-      console.error(`Erro ao copiar arquivo: ${error.message}`);
+      console.error(`Erro ao copiar arquivo: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
 
   // Listar arquivos em um diretório
-  async listFiles(directory, extensions = []) {
+  async listFiles(directory: string, extensions: string[] = []) {
     try {
       const files = await fs.readdir(directory);
       
@@ -103,13 +103,13 @@ class FileManager {
         return extensions.includes(ext);
       });
     } catch (error) {
-      console.error(`Erro ao listar arquivos: ${error.message}`);
+      console.error(`Erro ao listar arquivos: ${error instanceof Error ? error.message : String(error)}`);
       return [];
     }
   }
 
   // Obter informações do arquivo
-  async getFileInfo(filePath) {
+  async getFileInfo(filePath: string) {
     try {
       const stats = await fs.stat(filePath);
       return {
@@ -120,7 +120,7 @@ class FileManager {
         isDirectory: stats.isDirectory()
       };
     } catch (error) {
-      console.error(`Erro ao obter informações do arquivo: ${error.message}`);
+      console.error(`Erro ao obter informações do arquivo: ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -142,13 +142,13 @@ class FileManager {
 
       return true;
     } catch (error) {
-      console.error(`Erro ao redimensionar imagem: ${error.message}`);
+      console.error(`Erro ao redimensionar imagem: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
 
   // Criar thumbnail
-  async createThumbnail(inputPath, outputPath, size = 150) {
+  async createThumbnail(inputPath: string, outputPath: string, size = 150) {
     try {
       await sharp(inputPath)
         .resize(size, size, { fit: 'cover' })
@@ -157,7 +157,7 @@ class FileManager {
 
       return true;
     } catch (error) {
-      console.error(`Erro ao criar thumbnail: ${error.message}`);
+      console.error(`Erro ao criar thumbnail: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
@@ -179,12 +179,12 @@ class FileManager {
         }
       }
     } catch (error) {
-      console.error(`Erro na limpeza de arquivos temporários: ${error.message}`);
+      console.error(`Erro na limpeza de arquivos temporários: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   // Verificar espaço em disco
-  async checkDiskSpace(directory) {
+  async checkDiskSpace(directory: string) {
     try {
       // No Windows, usar uma abordagem simplificada
       const { exec } = require('child_process');
@@ -218,7 +218,7 @@ class FileManager {
         percentage: size > 0 ? (usedSpace / size) * 100 : 0
       };
     } catch (error) {
-      console.error(`Erro ao verificar espaço em disco: ${error.message}`);
+      console.error(`Erro ao verificar espaço em disco: ${error instanceof Error ? error.message : String(error)}`);
       // Retornar valores padrão se não conseguir obter informações
       return {
         free: 1000000000, // 1GB
@@ -230,13 +230,13 @@ class FileManager {
   }
 
   // Validar tipo de arquivo
-  validateFileType(filename, allowedTypes) {
+  validateFileType(filename: string, allowedTypes: string[]) {
     const ext = path.extname(filename).toLowerCase();
     return allowedTypes.includes(ext);
   }
 
   // Gerar nome único para arquivo
-  generateUniqueFilename(originalName, prefix = '') {
+  generateUniqueFilename(originalName: string, prefix = '') {
     const ext = path.extname(originalName);
     const name = path.basename(originalName, ext);
     const timestamp = Date.now();
@@ -246,18 +246,18 @@ class FileManager {
   }
 
   // Calcular checksum do arquivo
-  async calculateChecksum(filePath) {
+  async calculateChecksum(filePath: string) {
     try {
       const fileBuffer = await fs.readFile(filePath);
       return createHash('sha256').update(fileBuffer).digest('hex');
     } catch (error) {
-      console.error('Erro ao calcular checksum:', error);
+      console.error('Erro ao calcular checksum:', error instanceof Error ? error.message : String(error));
       return null;
     }
   }
 
   // Processar metadados de imagem
-  async processImageMetadata(filePath) {
+  async processImageMetadata(filePath: string) {
     try {
       const metadata = await sharp(filePath).metadata();
       return {
@@ -270,7 +270,7 @@ class FileManager {
         channels: metadata.channels
       };
     } catch (error) {
-      console.error('Erro ao processar metadados da imagem:', error);
+      console.error('Erro ao processar metadados da imagem:', error instanceof Error ? error.message : String(error));
       return null;
     }
   }
@@ -312,13 +312,13 @@ class FileManager {
       
       return files;
     } catch (error) {
-      console.error('Erro ao buscar arquivos:', error);
+      console.error('Erro ao buscar arquivos:', error instanceof Error ? error.message : String(error));
       return [];
     }
   }
 
   // Atualizar estatísticas do usuário
-  async updateUserStats(userId, fileSize) {
+  async updateUserStats(userId: string, fileSize: number) {
     try {
       await User.findByIdAndUpdate(userId, {
         $inc: {
@@ -330,7 +330,7 @@ class FileManager {
         }
       });
     } catch (error) {
-      console.error('Erro ao atualizar estatísticas do usuário:', error);
+      console.error('Erro ao atualizar estatísticas do usuário:', error instanceof Error ? error.message : String(error));
     }
   }
 }

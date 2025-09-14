@@ -234,7 +234,10 @@ userSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      return next(error);
+    }
+    return next(new Error('An unknown error occurred during password hashing.'));
   }
 });
 

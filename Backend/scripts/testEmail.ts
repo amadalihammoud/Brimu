@@ -30,20 +30,21 @@ class EmailTester {
       console.log('✅ Configuração de email válida!');
       return verification;
     } catch (error) {
-      console.error('❌ Erro na configuração de email:', error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Erro na configuração de email:', message);
       return false;
     }
   }
 
   // Enviar email de teste
-  async sendTestEmail(to: string = config.email.user): Promise<boolean> {
+  async sendTestEmail(to: string = config.email.user || ''): Promise<boolean> {
     try {
       console.log(`📧 Enviando email de teste para: ${to}`);
       
       const testEmailOptions = {
         from: {
           name: 'Sistema Brimu',
-          address: config.email.user
+          address: config.email.user || ''
         },
         to: to,
         subject: '🌳 Teste de Configuração - Sistema Brimu',
@@ -96,9 +97,9 @@ class EmailTester {
 Se você está lendo esta mensagem, a configuração de email está correta.
 
 📊 INFORMAÇÕES DO TESTE:
-- Data/Hora: \${new Date().toLocaleString('pt-BR')}
-- Servidor: \${config.email.host}:\${config.email.port}
-- Remetente: \${config.email.user}
+- Data/Hora: ${new Date().toLocaleString('pt-BR')}
+- Servidor: ${config.email.host}:${config.email.port}
+- Remetente: ${config.email.user}
 - Status: Configuração válida
 
 ⚠️ PRÓXIMOS PASSOS:
@@ -117,7 +118,8 @@ Este email foi gerado automaticamente pelo sistema de testes.
       
       return true;
     } catch (error) {
-      console.error('❌ Erro ao enviar email de teste:', error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Erro ao enviar email de teste:', message);
       return false;
     }
   }
@@ -181,7 +183,8 @@ Este email foi gerado automaticamente pelo sistema de testes.
         await testTransporter.verify();
         console.log(`✅ ${testConfig.name}: Funcionando`);
       } catch (error) {
-        console.log(`❌ ${testConfig.name}: Falhou (${error.message})`);
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`❌ ${testConfig.name}: Falhou (${message})`);
       }
     }
   }
@@ -201,7 +204,11 @@ if (require.main === module) {
       break;
     case 'send':
       const email = args[1] || config.email.user;
-      tester.sendTestEmail(email);
+      if (email) {
+        tester.sendTestEmail(email);
+      } else {
+        console.error('Email de destino não configurado.');
+      }
       break;
     case 'alternatives':
       tester.testAlternativeConfigs();

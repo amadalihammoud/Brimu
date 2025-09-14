@@ -12,12 +12,12 @@ router.get('/', async (req, res) => {
     
     // Construir filtros
     const filters: any = {};
-    if (status) filters.status = parseStringParam(status);
-    if (client) filters.client = parseStringParam(client);
-    if (service) filters.service = parseStringParam(service);
+    if (status) filters.status = parseStringParam(status as string);
+    if (client) filters.client = parseStringParam(client as string);
+    if (service) filters.service = parseStringParam(service as string);
     
-    const limitNum = parseNumberParam(limit) || 50;
-    const pageNum = parseNumberParam(page) || 1;
+    const limitNum = parseNumberParam(limit as string) || 50;
+    const pageNum = parseNumberParam(page as string) || 1;
     const skip = (pageNum - 1) * limitNum;
     
     const orders = await Order.find(filters)
@@ -36,9 +36,9 @@ router.get('/', async (req, res) => {
       data: orders,
       pagination: {
         total,
-        page: parseNumberParam(page),
-        limit: parseNumberParam(limit),
-        pages: Math.ceil(total / parseNumberParam(limit))
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(total / limitNum)
       }
     });
   } catch (error) {
@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -64,8 +64,8 @@ router.get('/available-equipment', async (req, res) => {
     }
     
     const availableEquipment = await (Order as any).getAvailableEquipment(
-      parseDateParam(scheduledDate), 
-      excludeOrderId
+      parseDateParam(scheduledDate as string), 
+      excludeOrderId as string
     );
     
     res.json({
@@ -78,7 +78,7 @@ router.get('/available-equipment', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -97,8 +97,8 @@ router.get('/equipment-conflicts/:equipmentId', async (req, res) => {
     
     const conflicts = await (Order as any).checkEquipmentDateConflict(
       req.params.equipmentId,
-      parseDateParam(scheduledDate),
-      excludeOrderId
+      parseDateParam(scheduledDate as string),
+      excludeOrderId as string
     );
     
     res.json({
@@ -112,7 +112,7 @@ router.get('/equipment-conflicts/:equipmentId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -190,7 +190,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -217,7 +217,7 @@ router.put('/:id', async (req, res) => {
     
     allowedFields.forEach(field => {
       if (orderData[field] !== undefined) {
-        order[field] = orderData[field];
+        (order as any)[field] = orderData[field];
       }
     });
     
@@ -239,7 +239,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -278,7 +278,7 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -313,7 +313,7 @@ router.put('/:id/status', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -333,7 +333,7 @@ router.get('/client/:clientId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -353,7 +353,7 @@ router.get('/status/:status', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -370,7 +370,7 @@ router.get('/scheduled', async (req, res) => {
       });
     }
     
-    const orders = await (Order as any).findScheduled(parseDateParam(startDate), parseDateParam(endDate));
+    const orders = await (Order as any).findScheduled(parseDateParam(startDate as string), parseDateParam(endDate as string));
     
     res.json({
       success: true,
@@ -382,7 +382,7 @@ router.get('/scheduled', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -401,7 +401,7 @@ router.get('/stats', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -410,7 +410,7 @@ router.get('/stats', async (req, res) => {
 router.post('/:id/equipment', async (req, res) => {
   try {
     const { equipmentId, notes } = req.body;
-    const assignedBy = req.user?.id || 'system'; // Assumindo que há middleware de auth
+    const assignedBy = (req as any).user?.id || 'system'; // Assumindo que há middleware de auth
     
     if (!equipmentId) {
       return res.status(400).json({
@@ -443,7 +443,7 @@ router.post('/:id/equipment', async (req, res) => {
       });
     }
     
-    if (equipment.assignedOrder) {
+    if ((equipment as any).assignedOrder) {
       return res.status(400).json({
         success: false,
         message: 'Equipamento já está atribuído a outra ordem'
@@ -473,7 +473,7 @@ router.post('/:id/equipment', async (req, res) => {
     console.error('Erro ao atribuir equipamento:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Erro interno do servidor'
+      message: error instanceof Error ? error.message : 'Erro interno do servidor'
     });
   }
 });
@@ -490,13 +490,13 @@ router.delete('/:id/equipment/:equipmentId', async (req, res) => {
     }
     
     // Remover equipamento da ordem
-    await order.removeEquipment(req.params.equipmentId);
+    await (order as any).removeEquipment(req.params.equipmentId);
     
     // Liberar equipamento
     const equipment = await Equipment.findById(req.params.equipmentId);
     if (equipment) {
-      equipment.assignedOrder = undefined;
-      equipment.assignedTo = undefined;
+      (equipment as any).assignedOrder = undefined;
+      (equipment as any).assignedTo = undefined;
       await equipment.save();
     }
     
@@ -517,7 +517,7 @@ router.delete('/:id/equipment/:equipmentId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -536,7 +536,7 @@ router.get('/equipment/:equipmentId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -566,7 +566,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

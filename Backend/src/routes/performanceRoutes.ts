@@ -50,7 +50,7 @@ router.get('/analytics', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error generating performance analytics', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/analytics',
       method: 'GET'
     });
@@ -58,7 +58,7 @@ router.get('/analytics', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -76,7 +76,7 @@ router.get('/profiles', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error fetching performance profiles', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/profiles',
       method: 'GET'
     });
@@ -84,7 +84,7 @@ router.get('/profiles', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -103,7 +103,7 @@ router.get('/anomalies', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error fetching performance anomalies', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/anomalies',
       method: 'GET'
     });
@@ -111,7 +111,7 @@ router.get('/anomalies', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -156,7 +156,7 @@ router.get('/metrics', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error searching performance metrics', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/metrics',
       method: 'GET'
     });
@@ -164,7 +164,7 @@ router.get('/metrics', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -186,7 +186,7 @@ router.get('/endpoint/*', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error analyzing endpoint performance', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/endpoint',
       method: 'GET'
     });
@@ -194,7 +194,7 @@ router.get('/endpoint/*', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -240,7 +240,7 @@ router.post('/metric', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error recording performance metric', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/metric',
       method: 'POST'
     });
@@ -248,7 +248,7 @@ router.post('/metric', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -323,7 +323,7 @@ router.get('/dashboard', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error generating performance dashboard', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/dashboard',
       method: 'GET'
     });
@@ -331,7 +331,7 @@ router.get('/dashboard', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -417,7 +417,7 @@ router.get('/realtime', (req, res) => {
 
   } catch (error) {
     advancedLoggingService.error('Error in performance realtime stream', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/realtime',
       method: 'GET'
     });
@@ -425,7 +425,7 @@ router.get('/realtime', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -458,7 +458,7 @@ router.get('/health', (req, res) => {
     });
   } catch (error) {
     advancedLoggingService.error('Error checking performance health', {
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       endpoint: '/api/performance/health',
       method: 'GET'
     });
@@ -466,7 +466,7 @@ router.get('/health', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

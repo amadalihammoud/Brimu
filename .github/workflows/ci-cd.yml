@@ -162,6 +162,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 🔐 Generate Production Secrets
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./Backend
+        run: |
+          npm install
+          npm run generate-secrets
+
       - name: 📝 Extract Metadata
         id: meta-backend
         uses: docker/metadata-action@v5

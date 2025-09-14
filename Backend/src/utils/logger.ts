@@ -127,7 +127,7 @@ class Logger {
   // Log de erros de banco de dados
   database(operation, error = null, meta = {}) {
     if (error) {
-      this.error(`Database ${operation} failed`, { ...meta, error: error.message });
+      this.error(`Database ${operation} failed`, { ...meta, error: error instanceof Error ? error.message : String(error) });
     } else {
       this.info(`Database ${operation} successful`, meta);
     }
@@ -168,7 +168,7 @@ class Logger {
         }
       });
     } catch (error) {
-      this.error('Error cleaning up log files', { error: error.message });
+      this.error('Error cleaning up log files', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -188,7 +188,7 @@ class Logger {
 
       return stats;
     } catch (error) {
-      this.error('Error getting log stats', { error: error.message });
+      this.error('Error getting log stats', { error: error instanceof Error ? error.message : String(error) });
       return null;
     }
   }

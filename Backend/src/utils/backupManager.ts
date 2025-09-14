@@ -105,7 +105,7 @@ class BackupManager {
 
     } catch (error) {
       console.error('❌ Erro ao criar backup:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -130,7 +130,8 @@ class BackupManager {
         }
       }
     } catch (error) {
-      if (error.code !== 'ENOENT') {
+      const nodeError = error as NodeJS.ErrnoException;
+      if (nodeError.code !== 'ENOENT') {
         throw error;
       }
     }
@@ -163,7 +164,8 @@ class BackupManager {
         }
       }
     } catch (error) {
-      if (error.code !== 'ENOENT') {
+      const nodeError = error as NodeJS.ErrnoException;
+      if (nodeError.code !== 'ENOENT') {
         throw error;
       }
     }
@@ -244,7 +246,7 @@ class BackupManager {
       
       console.log(`📦 Backup comprimido: ${path.basename(zipPath)}`);
     } catch (error) {
-      console.warn('⚠️ Erro ao comprimir backup:', error.message);
+      console.warn('⚠️ Erro ao comprimir backup:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -293,8 +295,9 @@ class BackupManager {
             }
           }
         } catch (error) {
-          if (error.code !== 'ENOENT') {
-            console.warn(`⚠️ Erro ao listar backups do tipo ${backupType}:`, error.message);
+          const nodeError = error as NodeJS.ErrnoException;
+          if (nodeError.code !== 'ENOENT') {
+            console.warn(`⚠️ Erro ao listar backups do tipo ${backupType}:`, error instanceof Error ? error.message : String(error));
           }
         }
       }
@@ -342,7 +345,7 @@ class BackupManager {
 
     } catch (error) {
       console.error('❌ Erro ao restaurar backup:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -401,7 +404,7 @@ class BackupManager {
             }
           }
         } catch (error) {
-          console.warn(`⚠️ Erro na limpeza de backups ${type}:`, error.message);
+          console.warn(`⚠️ Erro na limpeza de backups ${type}:`, error instanceof Error ? error.message : String(error));
         }
       }
 

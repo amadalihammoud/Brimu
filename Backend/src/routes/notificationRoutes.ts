@@ -53,7 +53,7 @@ router.get('/', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -116,7 +116,7 @@ router.post('/', (req, res) => {
       res.status(500).json({
         success: false,
         message: 'Erro ao enviar notificação',
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     });
 
@@ -125,7 +125,7 @@ router.post('/', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -168,7 +168,7 @@ router.post('/template', (req, res) => {
         success: false,
         message: error.message.includes('Template não encontrado') ? 
           'Template não encontrado' : 'Erro ao enviar notificação',
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     });
 
@@ -177,7 +177,7 @@ router.post('/template', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -213,7 +213,7 @@ router.put('/:id/read', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -240,7 +240,7 @@ router.get('/templates', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -294,7 +294,7 @@ router.post('/templates', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -321,7 +321,7 @@ router.get('/stats', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

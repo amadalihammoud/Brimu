@@ -292,7 +292,7 @@ class HealthCheckService extends EventEmitter {
           status: 'unhealthy',
           responseTime: 0,
           message: 'Check execution failed',
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           critical: config.critical,
           lastCheck: Date.now()
         };
@@ -345,7 +345,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Database connection failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: true
       };
     }
@@ -389,7 +389,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Cache connection failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: false,
         details: {
           fallbackToMemory: true
@@ -449,7 +449,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'File system operations failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: true
       };
     }
@@ -502,7 +502,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Memory check failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: false
       };
     }
@@ -548,7 +548,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'CPU check failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: false
       };
     }
@@ -597,7 +597,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Disk space check failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: true
       };
     }
@@ -641,7 +641,7 @@ class HealthCheckService extends EventEmitter {
         status: 'degraded',
         responseTime: Date.now() - startTime,
         message: 'Performance check failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: false
       };
     }
@@ -692,7 +692,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Security check failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: true
       };
     }
@@ -731,7 +731,7 @@ class HealthCheckService extends EventEmitter {
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         message: 'Check execution failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         critical: config.critical,
         lastCheck: Date.now()
       };
@@ -985,7 +985,7 @@ class HealthCheckService extends EventEmitter {
       this.emit('healthAnalysis', health);
     } catch (error) {
       advancedLoggingService.error('Health analysis failed', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         component: 'HealthCheckService'
       });
     }

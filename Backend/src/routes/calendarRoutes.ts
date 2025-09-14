@@ -341,7 +341,7 @@ router.get('/', (req, res) => {
     console.error('Erro ao listar eventos:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -361,7 +361,7 @@ router.get('/:id', (req, res) => {
     console.error('Erro ao buscar evento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -500,7 +500,7 @@ router.post('/', (req, res) => {
     console.error('Erro ao criar evento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -553,7 +553,7 @@ router.put('/:id', (req, res) => {
     console.error('Erro ao atualizar evento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -578,7 +578,7 @@ router.delete('/:id', (req, res) => {
     console.error('Erro ao remover evento:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -641,7 +641,7 @@ router.post('/:id/status', (req, res) => {
     console.error('Erro ao atualizar status:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -676,7 +676,7 @@ router.get('/upcoming/:days', (req, res) => {
     console.error('Erro ao buscar eventos próximos:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });
@@ -737,7 +737,7 @@ router.get('/stats/overview', (req, res) => {
     console.error('Erro ao gerar estatísticas:', error);
     res.status(500).json({ 
       message: 'Erro interno do servidor',
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error) 
     });
   }
 });

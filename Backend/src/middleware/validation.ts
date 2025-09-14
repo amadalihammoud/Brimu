@@ -38,7 +38,8 @@ const validateRegister = [
     .isLength({ min: config.validation.nameMinLength || 2 })
     .withMessage(`Nome deve ter pelo menos ${config.validation.nameMinLength || 2} caracteres`)
     .matches(/^[a-zA-ZÀ-ÿ\s]+$/)
-    .withMessage('Nome deve conter apenas letras e espaços'),
+    .withMessage('Nome deve conter apenas letras e espaços')
+    .escape(),
   body('email')
     .isEmail()
     .normalizeEmail()

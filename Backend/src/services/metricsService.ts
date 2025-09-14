@@ -336,7 +336,7 @@ class MetricsService extends EventEmitter {
       const key = `metric:${Date.now()}`;
       await cache.set(key, metric, 86400); // 24 horas
     } catch (error) {
-      logger.error('Failed to store metric in cache', { error: error.message });
+      logger.error('Failed to store metric in cache', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -425,7 +425,7 @@ class MetricsService extends EventEmitter {
       } catch (error) {
         logger.error('Failed to send metric alert notification', {
           alertId: alert.id,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         });
       }
     });

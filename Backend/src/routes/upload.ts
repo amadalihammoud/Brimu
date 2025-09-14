@@ -7,6 +7,8 @@ import { auth } from '../middleware/auth';
 import File from '../models/File';
 import User from '../models/User';
 import { parseStringParam, parseNumberParam } from '../utils/queryHelpers';
+import { fileTypeFromFile } from 'file-type';
+import config from '../config';
 
 const router = express.Router();
 
@@ -23,11 +25,26 @@ router.post('/image', auth, (imageUpload as any).single('image'), async (req: Re
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
     }
 
-    const userId = req.user.id;
+    // Validar tipo de arquivo real (magic number)
+    const fileTypeResult = await fileTypeFromFile(req.file.path);
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    if (!fileTypeResult || !allowedImageTypes.includes(fileTypeResult.mime)) {
+      // Se o tipo for inválido, deletar o arquivo imediatamente
+      await fs.unlink(req.file.path);
+      return res.status(400).json({ 
+        message: 'Tipo de arquivo inválido ou não permitido. Apenas imagens (jpeg, png, gif, webp) são aceitas.' 
+      });
+    }
+
+    // Forçar o mimetype real para o resto do processamento
+    req.file.mimetype = fileTypeResult.mime;
+
+    const userId = (req as any).user.id;
     
     // Verificar se usuário pode fazer upload
     const user = await User.findById(userId);
-    if (!(user as any).canUpload(req.file.size, 1)) {
+    if (!user || !(user as any).canUpload(req.file.size, 1)) {
       return res.status(403).json({ 
         message: 'Usuário não tem permissão para fazer upload ou arquivo muito grande' 
       });
@@ -70,13 +87,13 @@ router.post('/image', auth, (imageUpload as any).single('image'), async (req: Re
       message: 'Imagem enviada com sucesso',
       file: {
         id: fileRecord._id,
-        filename: req.file.filename,
-        originalname: req.file.originalname,
-        path: req.file.path,
-        size: req.file.size,
-        mimetype: req.file.mimetype,
-        url: fileRecord.url,
-        thumbnailUrl: fileRecord.thumbnailUrl,
+        filename: fileRecord.filename,
+        originalname: fileRecord.originalname,
+        path: fileRecord.path,
+        size: fileRecord.size,
+        mimetype: fileRecord.mimetype,
+        url: (fileRecord as any).url,
+        thumbnailUrl: (fileRecord as any).thumbnailUrl,
         imageMetadata: imageMetadata
       }
     });
@@ -103,13 +120,13 @@ router.post('/images', auth, (multipleImages as any), async (req: Request, res: 
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        size: fileInfo.size,
+        size: fileInfo?.size,
         mimetype: file.mimetype
       });
     }
 
     res.status(200).json({
-      message: `${uploadedFiles.length} imagens enviadas com sucesso`,
+      message: `${uploadedFiles.length} documentos enviados com sucesso`,
       files: uploadedFiles
     });
   } catch (error) {
@@ -125,6 +142,21 @@ router.post('/document', auth, (documentUpload as any).single('document'), async
       return res.status(400).json({ message: 'Nenhum arquivo enviado' });
     }
 
+    // Validar tipo de arquivo real (magic number)
+    const fileTypeResult = await fileTypeFromFile(req.file.path);
+    const allowedDocTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+    if (!fileTypeResult || !allowedDocTypes.includes(fileTypeResult.mime)) {
+      // Se o tipo for inválido, deletar o arquivo imediatamente
+      await fs.unlink(req.file.path);
+      return res.status(400).json({ 
+        message: 'Tipo de arquivo inválido ou não permitido. Apenas documentos (pdf, doc, docx) são aceitos.' 
+      });
+    }
+
+    // Forçar o mimetype real para o resto do processamento
+    req.file.mimetype = fileTypeResult.mime;
+
     const fileInfo = await fileManager.getFileInfo(req.file.path);
     
     res.status(200).json({
@@ -133,7 +165,7 @@ router.post('/document', auth, (documentUpload as any).single('document'), async
         filename: req.file.filename,
         originalname: req.file.originalname,
         path: req.file.path,
-        size: fileInfo.size,
+        size: fileInfo?.size,
         mimetype: req.file.mimetype
       }
     });
@@ -160,7 +192,7 @@ router.post('/documents', auth, (multipleDocuments as any), async (req: Request,
         filename: file.filename,
         originalname: file.originalname,
         path: file.path,
-        size: fileInfo.size,
+        size: fileInfo?.size,
         mimetype: file.mimetype
       });
     }
@@ -179,9 +211,14 @@ router.post('/documents', auth, (multipleDocuments as any), async (req: Request,
 router.get('/files/:type', auth, async (req: Request, res: Response) => {
   try {
     const { type } = req.params;
-    const { directory } = req.query;
+    const { directory: queryDirectory } = req.query;
+
+    let directory: string | undefined;
+    if (typeof queryDirectory === 'string') {
+      directory = queryDirectory;
+    }
     
-    let targetDir;
+    let targetDir: string; // Explicitly type as string
     switch (type) {
       case 'images':
         targetDir = directory || 'uploads/images';
@@ -318,7 +355,11 @@ router.post('/cleanup-temp', auth, async (req: Request, res: Response) => {
 // Verificar espaço em disco
 router.get('/disk-space', auth, async (req: Request, res: Response) => {
   try {
-    const { directory } = req.query;
+    const { directory: queryDirectory } = req.query;
+    let directory: string | undefined;
+    if (typeof queryDirectory === 'string') {
+      directory = queryDirectory;
+    }
     const targetDir = directory || 'uploads';
     
     const spaceInfo = await fileManager.checkDiskSpace(targetDir);
@@ -351,12 +392,12 @@ router.get('/search', auth, async (req: Request, res: Response) => {
     } = req.query;
 
     const criteria = {
-      userId: req.user.id,
-      category,
-      tags: tags ? parseStringParam(tags).split(',') : undefined,
-      search,
-      limit: parseNumberParam(limit),
-      skip: parseNumberParam(skip)
+      userId: (req as any).user.id,
+      category: category as string,
+      tags: tags ? parseStringParam(tags as string).split(',') : undefined,
+      search: search as string,
+      limit: parseNumberParam(limit as string),
+      skip: parseNumberParam(skip as string)
     };
 
     const files = await fileManager.findFiles(criteria);
@@ -367,9 +408,6 @@ router.get('/search', auth, async (req: Request, res: Response) => {
       total: files.length,
       criteria: criteria
     });
-  } catch (error) {
-    console.error('Erro ao buscar arquivos:', error);
-    res.status(500).json({ message: 'Erro interno do servidor' });
   }
 });
 
@@ -377,7 +415,7 @@ router.get('/search', auth, async (req: Request, res: Response) => {
 router.get('/file/:id', auth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
 
     const file = await File.findById(id).populate('uploadedBy', 'name email');
     
@@ -407,7 +445,7 @@ router.get('/file/:id', auth, async (req: Request, res: Response) => {
 router.put('/file/:id', auth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
     const { tags, description, isPublic } = req.body;
 
     const file = await File.findById(id);
@@ -422,9 +460,9 @@ router.put('/file/:id', auth, async (req: Request, res: Response) => {
     }
 
     // Atualizar campos permitidos
-    if (tags !== undefined) file.tags = tags;
-    if (description !== undefined) file.description = description;
-    if (isPublic !== undefined) file.isPublic = isPublic;
+    if (tags !== undefined) (file as any).tags = tags;
+    if (description !== undefined) (file as any).description = description;
+    if (isPublic !== undefined) (file as any).isPublic = isPublic;
 
     await file.save();
 
@@ -442,7 +480,7 @@ router.put('/file/:id', auth, async (req: Request, res: Response) => {
 router.get('/download/:id', auth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
 
     const file = await File.findById(id);
     
@@ -457,7 +495,7 @@ router.get('/download/:id', auth, async (req: Request, res: Response) => {
 
     // Verificar se arquivo existe fisicamente
     try {
-      await fs.access(file.path);
+      await fs.access((file as any).path);
     } catch {
       return res.status(404).json({ message: 'Arquivo não encontrado no sistema de arquivos' });
     }
@@ -466,12 +504,12 @@ router.get('/download/:id', auth, async (req: Request, res: Response) => {
     await (file as any).incrementDownload();
 
     // Definir headers para download
-    res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
-    res.setHeader('Content-Type', file.mimetype);
-    res.setHeader('Content-Length', file.size);
+    res.setHeader('Content-Disposition', `attachment; filename="${(file as any).originalName}"`);
+    res.setHeader('Content-Type', (file as any).mimetype);
+    res.setHeader('Content-Length', (file as any).size);
 
     // Enviar arquivo
-    res.sendFile(path.resolve(file.path));
+    res.sendFile(path.resolve((file as any).path));
   } catch (error) {
     console.error('Erro no download:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
@@ -481,10 +519,10 @@ router.get('/download/:id', auth, async (req: Request, res: Response) => {
 // Estatísticas de arquivos
 router.get('/stats', auth, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = (req as any).user.id;
     const user = await User.findById(userId);
 
-    if (!user.hasPermission('viewAnalytics')) {
+    if (!user || !(user as any).hasPermission('viewAnalytics')) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 

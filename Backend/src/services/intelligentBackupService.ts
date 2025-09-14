@@ -157,7 +157,7 @@ class IntelligentBackupService extends EventEmitter {
         logger.info('Backup service disabled in configuration');
       }
     } catch (error) {
-      logger.error('Failed to initialize backup service', { error: error.message });
+      logger.error('Failed to initialize backup service', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -265,7 +265,7 @@ class IntelligentBackupService extends EventEmitter {
         files: { total: 0, directories: 0, size: 0 },
         duration: Date.now() - startTime,
         status: 'failed',
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         location: {}
       };
 
@@ -278,7 +278,7 @@ class IntelligentBackupService extends EventEmitter {
       logger.error('Intelligent backup failed', {
         backupId,
         type,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
 
       throw error;
@@ -362,7 +362,7 @@ class IntelligentBackupService extends EventEmitter {
     } catch (error) {
       logger.error('Failed to restore backup', {
         backupId,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
@@ -403,7 +403,7 @@ class IntelligentBackupService extends EventEmitter {
         logger.info('Starting scheduled daily backup');
         await this.createIntelligentBackup('daily');
       } catch (error) {
-        logger.error('Scheduled daily backup failed', { error: error.message });
+        logger.error('Scheduled daily backup failed', { error: error instanceof Error ? error.message : String(error) });
       }
     }, { scheduled: false });
 
@@ -413,7 +413,7 @@ class IntelligentBackupService extends EventEmitter {
         logger.info('Starting scheduled weekly backup');
         await this.createIntelligentBackup('weekly');
       } catch (error) {
-        logger.error('Scheduled weekly backup failed', { error: error.message });
+        logger.error('Scheduled weekly backup failed', { error: error instanceof Error ? error.message : String(error) });
       }
     }, { scheduled: false });
 
@@ -423,7 +423,7 @@ class IntelligentBackupService extends EventEmitter {
         logger.info('Starting scheduled monthly backup');
         await this.createIntelligentBackup('monthly');
       } catch (error) {
-        logger.error('Scheduled monthly backup failed', { error: error.message });
+        logger.error('Scheduled monthly backup failed', { error: error instanceof Error ? error.message : String(error) });
       }
     }, { scheduled: false });
 
@@ -521,7 +521,7 @@ class IntelligentBackupService extends EventEmitter {
         } catch (error) {
           logger.error('Failed to cleanup old backup', {
             backupId: backup.id,
-            error: error.message
+            error: error instanceof Error ? error.message : String(error)
           });
         }
       }
@@ -559,7 +559,7 @@ class IntelligentBackupService extends EventEmitter {
         }
       });
     } catch (error) {
-      logger.error('Failed to send backup notification', { error: error.message });
+      logger.error('Failed to send backup notification', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -578,7 +578,7 @@ class IntelligentBackupService extends EventEmitter {
       const historyFile = path.join(this.backupDir, 'backup-history.json');
       await fs.writeFile(historyFile, JSON.stringify(this.backupHistory, null, 2));
     } catch (error) {
-      logger.error('Failed to save backup history', { error: error.message });
+      logger.error('Failed to save backup history', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 

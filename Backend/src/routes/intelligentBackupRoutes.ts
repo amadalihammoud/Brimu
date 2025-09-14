@@ -62,7 +62,7 @@ router.post('/create', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro ao criar backup',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -89,7 +89,7 @@ router.get('/progress/:id', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -109,7 +109,7 @@ router.get('/active', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -132,7 +132,7 @@ router.get('/history', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -152,7 +152,7 @@ router.get('/stats', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -180,9 +180,9 @@ router.post('/restore', async (req, res) => {
     console.error('Erro ao restaurar backup:', error);
     res.status(500).json({
       success: false,
-      message: error.message.includes('não encontrado') ? 
+      message: error instanceof Error && error.message.includes('não encontrado') ? 
         'Backup não encontrado' : 'Erro ao restaurar backup',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -252,7 +252,7 @@ router.get('/dashboard', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -307,7 +307,7 @@ router.get('/progress/:id/stream', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });

@@ -203,7 +203,7 @@ backup-keys/
         console.log('✅ .gitignore atualizado com entradas de segurança!');
       }
     } catch (error) {
-      console.warn('⚠️  Não foi possível atualizar .gitignore:', error.message);
+      console.warn('⚠️  Não foi possível atualizar .gitignore:', error instanceof Error ? error.message : error);
     }
   }
 

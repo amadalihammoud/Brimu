@@ -49,7 +49,8 @@
       "Bash(robocopy:*)",
       "Bash(vercel:*)",
       "Bash(xargs sed:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx @google/gemini-cli)"
     ],
     "deny": [],
     "ask": []

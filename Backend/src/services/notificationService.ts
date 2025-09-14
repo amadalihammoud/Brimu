@@ -327,7 +327,7 @@ class NotificationService extends EventEmitter {
       logger.error('Failed to send notification to channel', {
         notificationId: notification.id,
         channel: channel.type,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -365,7 +365,7 @@ class NotificationService extends EventEmitter {
       } catch (error) {
         logger.error('Failed to send WebSocket notification', {
           connectionId: conn.id,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         });
         
         // Remover conexão inválida
@@ -426,7 +426,7 @@ class NotificationService extends EventEmitter {
     } catch (error) {
       logger.error('Failed to store notification in cache', {
         notificationId: notification.id,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }

@@ -204,10 +204,19 @@ app.get('/api/status', (req: Request, res: Response) => {
 
 // Middleware de tratamento de erros com métricas
 app.use(errorMetricsMiddleware);
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  let errorMessage = 'Algo deu errado';
+  let errorStack;
+
+  if (err instanceof Error) {
+    errorMessage = err.message;
+    errorStack = err.stack;
+  }
+
   advancedLoggingService.error('Application Error', {
-    error: err.message,
-    stack: err.stack,
+    error: errorMessage,
+    stack: errorStack,
     url: req.url,
     method: req.method,
     userAgent: req.get('User-Agent'),
@@ -230,7 +239,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   
   res.status(500).json({ 
     message: 'Erro interno do servidor',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Algo deu errado'
+    error: isDevelopment ? errorMessage : 'Algo deu errado'
   });
   return;
 });
@@ -257,7 +266,8 @@ const startServer = async (): Promise<void> => {
       await cache.connect();
       advancedLoggingService.info('Redis Cache Connected');
     } catch (error) {
-      advancedLoggingService.warn('Redis Cache Unavailable - Using Memory Fallback', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown Redis connection error';
+      advancedLoggingService.warn('Redis Cache Unavailable - Using Memory Fallback', { error: errorMessage });
     }
     
     // Iniciar servidor
@@ -311,9 +321,10 @@ const startServer = async (): Promise<void> => {
     });
 
   } catch (error) {
+    const isError = error instanceof Error;
     advancedLoggingService.error('Failed to Start Server', {
-      error: error.message,
-      stack: error.stack,
+      error: isError ? error.message : 'Unknown error during server start',
+      stack: isError ? error.stack : undefined,
       environment: config.server.environment,
       port: PORT
     });

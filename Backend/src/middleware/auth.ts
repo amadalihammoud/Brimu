@@ -76,15 +76,21 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
     let message = 'Erro na verificação do token.';
     let code = 'TOKEN_ERROR';
 
-    if (error.name === 'TokenExpiredError') {
-      message = 'Token expirado.';
-      code = 'TOKEN_EXPIRED';
-    } else if (error.name === 'JsonWebTokenError') {
-      message = 'Token inválido.';
-      code = 'INVALID_TOKEN';
-    } else if (error.name === 'NotBeforeError') {
-      message = 'Token ainda não é válido.';
-      code = 'TOKEN_NOT_ACTIVE';
+    if (error instanceof Error) {
+        switch (error.name) {
+            case 'TokenExpiredError':
+                message = 'Token expirado.';
+                code = 'TOKEN_EXPIRED';
+                break;
+            case 'JsonWebTokenError':
+                message = 'Token inválido.';
+                code = 'INVALID_TOKEN';
+                break;
+            case 'NotBeforeError':
+                message = 'Token ainda não é válido.';
+                code = 'TOKEN_NOT_ACTIVE';
+                break;
+        }
     }
 
     return res.status(401).json({ 

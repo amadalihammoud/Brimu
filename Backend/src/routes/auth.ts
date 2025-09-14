@@ -11,28 +11,13 @@ import {
   csrfProtectionMiddleware,
   authenticateWithCookie
 } from '../middleware/security';
+import { validateRegister } from '../middleware/validation';
 
 const router = express.Router();
 
-// Middleware para validar dados
-const validateUser = [
-  body('name').trim().isLength({ min: 2 }).withMessage('Nome deve ter pelo menos 2 caracteres'),
-  body('email').isEmail().normalizeEmail().withMessage('Email inválido'),
-  body('password').isLength({ min: 6 }).withMessage('Senha deve ter pelo menos 6 caracteres')
-];
-
 // Registrar usuário
-router.post('/register', validateUser, async (req, res) => {
+router.post('/register', validateRegister, async (req: Request, res: Response) => {
   try {
-    // Verificar erros de validação
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        message: 'Dados inválidos',
-        errors: errors.array()
-      });
-    }
-
     const { name, email, password, role = 'employee' } = req.body;
 
     // Verificar se usuário já existe
