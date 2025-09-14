@@ -115,11 +115,12 @@ export function useAuth() {
                             validation.data.email === 'admin@email.com';
         
         // Salvar dados do usuário (vindos do backend ou mockados)
-        const userData = response.data.user || {
-          id: response.data.userId || '1',
-          name: response.data.name || (isAdminEmail ? 'Administrador' : 'Cliente'),
+        const responseData = response.data as any;
+        const userData = responseData.user || {
+          id: responseData.userId || '1',
+          name: responseData.name || (isAdminEmail ? 'Administrador' : 'Cliente'),
           email: validation.data.email,
-          role: response.data.role || (isAdminEmail ? 'admin' as const : 'client' as const)
+          role: responseData.role || (isAdminEmail ? 'admin' as const : 'client' as const)
         };
         
         // Validar dados do usuário antes de armazenar
